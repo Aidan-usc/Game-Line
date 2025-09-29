@@ -1,0 +1,393 @@
+/*
+Theme Name: GameLine
+Theme URI: http://gameline.local
+Author: You
+Version: 1.0.0
+*/
+
+/* --- Google Fonts --- */
+@import url('https://fonts.googleapis.com/css2?family=Audiowide&family=Nabla:EDPT@0..200&family=STIX+Two+Text:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+
+/* --- Design Tokens (constants) --- */
+:root{
+  /* Colors */
+  --gl-yellow: #FFE559; /* Maize */
+  --gl-purple: #3B1E76; /* Persian indigo */
+  --gl-white:  #FAF0F0; /* Snow */
+  --gl-green:  #48C152; /* Dark pastel green */
+  --gl-red:    #9C0C13; /* Carmine */
+  --gl-black:  #140116; /* Dark purple (near-black) */
+
+  /* Basic UI tokens used across the site */
+  --gl-radius: 16px;
+  --gl-shadow: 0 6px 16px rgba(0,0,0,.12);
+
+  /* Layout (already used by your layout CSS) */
+  --gl-header-h: 90px;
+  --gl-rail-w: 420px;
+  --gl-rail-gutter: 24px;
+}
+
+
+a{ color: var(--gl-purple); text-decoration: none; }
+a:hover{ text-decoration: underline; }
+
+/* Site title “GameLine” uses Nabla (if you render text instead of an image) */
+.gl-header .site-title{
+  font-family: "Nabla", system-ui, sans-serif;
+  letter-spacing: .1em;
+}
+
+/* Header nav (SEC / MLB / NFL / Leaderboard) uses Audiowide */
+.gl-header nav a{
+  font-family: "Audiowide", system-ui, sans-serif;
+  margin: 0 12px;
+  font-size: 23px;
+  font-weight:bolder;
+  letter-spacing: .15em;
+  color: var(--gl-yellow);
+}
+.gl-header nav a:hover{ opacity:.9; text-decoration:none; }
+
+/* Utility: headings in cards/sections still use body font unless overridden */
+h1,h2,h3,h4{ margin:0; }
+
+/* --- Header layout refinements --- */
+.gl-header{
+  height: var(--gl-header-h);
+  padding: 0 var(--gl-header-pad-x);   /* no top/bottom padding */
+  display: flex;
+  align-items: center;                  /* vertically center nav/buttons */
+  justify-content: space-between;
+  background: var(--gl-purple);
+  color: #fff;
+  box-shadow: var(--gl-shadow);
+  position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+}
+
+/* Logo + Title */
+.brand{ display:flex; align-items:center; gap:12px; text-decoration:none; color:#fff; }
+.brand-logo{ height:96px; width:auto; display:block; padding-left: 15px; padding-top: 5px; padding-bottom:5px;}
+.site-title{ font-family:"Nabla", system-ui, sans-serif; font-size: 60px; font-weight:400; line-height:1.1; color:#fff; }
+
+
+.brand:hover {
+  text-decoration: none; /* explicitly disable underline on hover */
+}
+
+/* Primary nav (Audiowide with separators) */
+.top-nav ul{ display:flex; align-items:center; gap:18px; list-style:none; margin:0; padding:0; }
+
+.top-nav ul li+li{
+  position:relative; padding-left:18px;
+}
+.top-nav ul li+li::before{
+  content:""; position:absolute; left:0; top:50%; transform:translateY(-50%);
+  width:2px; height:18px; background: rgba(255,255,255,.35);
+  border-radius:2px;
+}
+.top-nav a:hover{ opacity:.9; }
+
+/* Wallet chip unchanged */
+.gl-chip{
+  background: rgba(255,255,255,.12);
+  padding:.45rem .75rem; border-radius:999px; font-weight:600;
+}
+
+/* Account button uses Audiowide and brand yellow accent on hover */
+.header-ctas{ display:flex; align-items:center; gap:12px; }
+.account-btn{
+  font-family:"Audiowide", system-ui, sans-serif;
+  color:#fff; text-decoration:none; padding:.5rem .9rem; border-radius:12px;
+  border:2px solid rgba(255,255,255,.25);
+}
+.account-btn:hover{
+  border-color: var(--gl-yellow);
+  background: rgba(255,229,89,.15);
+}
+
+html,body{background:var(--gl-snow);color:var(--gl-ink);font-family: "STIX Two Text", ui-serif, Georgia, "Times New Roman", serif;;margin:0;}
+a{color:var(--gl-purple);text-decoration:none} a:hover{text-decoration:underline}
+
+.container{max-width:1180px;margin:24px auto;padding:0 16px}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+.card{background:var(--gl-card);border-radius:var(--gl-radius);box-shadow:var(--gl-shadow);padding:14px}
+.card-title{font-weight:700}
+
+.btn{border:0;border-radius:12px;padding:.6rem .9rem;cursor:pointer}
+.btn-primary{background:var(--gl-purple);color:#fff}
+.btn-accent{background:var(--gl-maize);color:#000}
+.btn-ghost{background:transparent;border:2px solid var(--gl-purple);color:var(--gl-purple)}
+
+.input{border:1.5px solid #d7d5e2;border-radius:10px;padding:.55rem .7rem;width:100%}
+.odds-pill{display:inline-block;padding:.55rem .9rem;border-radius:999px;border:2px solid #e9e7f3;margin:6px 6px 0 0}
+.odds-pill.is-selected{background:var(--gl-purple);color:#fff;border-color:var(--gl-purple)}
+.parlay{position:sticky;top:16px}
+
+.lb-up{color:var(--gl-ok)} .lb-down{color:var(--gl-bad)}
+.footer{padding:24px;text-align:center;color:var(--gl-muted)}
+
+/* --- Game card --- */
+.game-card{ padding:0; overflow:hidden }
+.game-head{
+  display:flex; justify-content:space-between; align-items:center;
+  background:#f3f1f8; color:#2b2348; font-weight:700;
+  padding:10px 14px; border-bottom:1px solid #e6e3f1;
+}
+.game-body{ padding:14px }
+.teams{
+  display:grid; grid-template-columns:1fr 36px 1fr; gap:12px; align-items:center; margin-bottom:10px;
+}
+.badge{
+  width:64px; height:64px; border-radius:50%; background:#eee; display:grid; place-items:center;
+  border:2px solid #dbd7ea; overflow:hidden;
+}
+.badge img{ width:44px; height:44px; object-fit:contain }
+.badge .abbr{ font-weight:800; color:#7d75a8; }
+
+.team-lines{ line-height:1.05 }
+.team-top{ font-size:.85rem; color:#6A6A78 }
+.team-bot{ font-size:1rem; font-weight:700; color:#30255f }
+
+/* Divider between teams */
+.at{ font-weight:700; color:#7a739f }
+
+/* Pill buttons (outlined) */
+.pill-row{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-top:10px }
+.pill{
+  border:2px solid var(--gl-purple); color:var(--gl-purple); background:#fff;
+  border-radius:999px; padding:.55rem .9rem; font-weight:700; text-align:center;
+  box-shadow:0 2px 0 rgba(59,30,118,.2) inset;
+}
+.pill .sub{ font-weight:600; opacity:.8 }
+.pill:hover{ background:#efe9ff }
+.pill.is-selected{ background:var(--gl-purple); color:#fff; }
+
+/* Right rail title (BETS IN PLAY / Build a Parlay) */
+.rail-title{
+  font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:#2b2348; margin-bottom:8px;
+}
+
+/* === Fixed Right Rail (desktop) === */
+:root{
+  --gl-rail-w: 420px;        /* rail width */
+  --gl-rail-gutter: 24px;    /* space between rail and main content */
+  --gl-header-h: 90px;       /* already in your sheet; keep in sync with header height */
+}
+
+/* Main content leaves room for the rail */
+.gl-main{
+  margin-right: calc(var(--gl-rail-w) + var(--gl-rail-gutter));
+  padding: calc(var(--gl-header-h) + 24px) 24px 32px 24px; /* top padding clears the fixed header */
+}
+
+/* The rail hugs the scrollbar (flush right), under the fixed header */
+.gl-rail{
+  position: fixed;
+  right: 0;
+  top: var(--gl-header-h);
+  bottom: 0;
+  width: var(--gl-rail-w);
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  background: #fff;               /* rail body */
+  border-left: 0;                 /* keep tight to the edge */
+  box-shadow: -2px 0 10px rgba(0,0,0,.06);
+}
+
+/* Optional: the purple frame look like in your screenshot */
+.gl-rail .rail-frame{
+  margin: 20px;                   /* inner margin for the frame */
+  border: 24px solid var(--gl-purple);
+  border-radius: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+}
+
+/* Title bar: big, all caps */
+.gl-rail .rail-titlebar{
+  font-family: "Audiowide", system-ui, sans-serif;
+  text-transform: uppercase;
+  font-weight: 900;
+  font-size: 2rem;
+  letter-spacing: .06em;
+  color: #fff;
+  background: var(--gl-purple);
+  padding: 16px 20px;
+  margin-bottom: 0;
+}
+
+/* Scrollable list of legs lives in the middle */
+.gl-rail .rail-scroll{
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  gap: 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Each leg card */
+.gl-rail .rail-leg{
+  background: #fff;
+  border: 1.5px solid #e9e7f3;
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+
+/* Footer is always visible at bottom inside the rail */
+.gl-rail .rail-footer{
+  position: sticky;      /* stays visible even when the list scrolls */
+  bottom: 0;
+  background: #fff;
+  padding: 16px 20px;
+  border-top: 2px solid #eee;
+  box-shadow: 0 -6px 12px rgba(0,0,0,.04);
+}
+
+/* Footer rows */
+.rail-row{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 8px 0;
+  font-weight: 800;
+  font-size: 1.15rem;
+}
+
+.rail-footer label{
+  display:block;
+  font-weight: 700;
+  margin: 10px 0 6px;
+}
+
+.rail-footer .input{
+  height: 44px;
+  font-size: 1rem;
+}
+
+/* Submit button across the bottom */
+.rail-submit{
+  width: 100%;
+  margin-top: 12px;
+  height: 52px;
+  border-radius: 14px;
+  background: var(--gl-green);
+  color: #fff;
+  font-weight: 800;
+  font-size: 1.05rem;
+  border: 0;
+  cursor: pointer;
+}
+.rail-submit:hover{ filter: brightness(.95); }
+
+/* Optional: tighten the inner card the legs render into (like your screenshot) */
+.rail-leg .meta-right{ text-align: right; font-weight: 900; }
+
+/* === Game grid layout next to the right rail === */
+#gl-games {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* three equal columns */
+  gap: 20px; /* space between cards */
+}
+
+/* Each game card fills its grid cell */
+#gl-games .game-card {
+  width: 100%;
+}
+@media (max-width: 1200px) {
+  #gl-games { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 800px) {
+  #gl-games { grid-template-columns: 1fr; }
+}
+/* ===== Leaderboard layout (left table + middle sidebar) ===== */
+.lb-layout{
+  display: grid;
+  grid-template-columns: 1fr 420px;    /* main table | side lists */
+  gap: 32px;
+  align-items: start;
+}
+
+/* Section heading */
+.section-title{
+  font-family: "STIX Two Text", serif;
+  font-weight: 900;
+  font-size: 2.25rem;
+  letter-spacing: .02em;
+  margin: 0 0 18px 0;
+}
+
+/* Main table block */
+.lb-table{
+  padding: 0;        /* card wrapper already has radius/shadow */
+  overflow: hidden;
+}
+.lb-row{
+  display: grid;
+  grid-template-columns: 1fr 24px 160px; /* name | vertical bar | amount */
+  align-items: center;
+  padding: 18px 20px;
+  background: #e6eaef;                   /* soft grey row like screenshot */
+  border-bottom: 2px solid #dfe4ea;
+}
+.lb-row:nth-child(odd){ background: #edf1f5; }
+.lb-row:last-child{ border-bottom: 0; }
+
+.lb-head{
+  background: transparent;
+  border-bottom: 0;
+  padding: 16px 20px 8px;
+  color: var(--gl-black);
+  font-weight: 900;
+}
+
+.lb-col-name{
+  font-weight: 800;
+  font-size: 1.15rem;
+}
+
+.lb-split{
+  justify-self: center;
+  width: 2px; height: 26px;
+  background: #aeb4c2;
+  border-radius: 2px;
+}
+
+.lb-col-amt{
+  text-align: right;
+  font-weight: 900;
+  font-size: 1.15rem;
+}
+
+/* Sidebar lists */
+.lb-aside{}
+
+.lb-subtitle{
+  font-family: "STIX Two Text", serif;
+  font-weight: 900;
+  font-size: 1.6rem;
+  letter-spacing: .02em;
+  margin: 0 0 10px 0;
+}
+
+.lb-list{
+  padding: 0;
+  overflow: hidden;
+}
+.lb-item{
+  background: #e6eaef;
+  padding: 16px 18px;
+  border-bottom: 2px solid #dfe4ea;
+  font-weight: 800;
+}
+.lb-item:nth-child(odd){ background: #edf1f5; }
+.lb-item:last-child{ border-bottom: 0; }
+
+/* Responsive: collapse sidebar under table */
+@media (max-width: 1200px){
+  .lb-layout{ grid-template-columns: 1fr; }
+}
