@@ -359,6 +359,47 @@ body {
   .card-grid.three { grid-template-columns: 1fr; }
 }
 
+/* HERO ARTWORK (right-side image) */
+.hero { position: relative; }
+
+.hero-content {
+  position: relative;
+  z-index: 2;                 /* keep text above artwork/overlay */
+  max-width: min(700px, 48%); /* keeps copy on the left half-ish */
+}
+
+/* The collage image on the right */
+.hero-art {
+  position: absolute;
+  right: clamp(16px, 6vw, 60px);
+  bottom: -10px;              /* tuck slightly below the hero box for depth */
+  width: clamp(300px, 38vw, 640px);
+  height: auto;
+  object-fit: contain;
+  pointer-events: none;       /* ignore clicks; buttons stay usable */
+  z-index: 1;                 /* sits between overlay (0) and text (2) */
+  filter: drop-shadow(0 10px 24px rgba(0,0,0,.35));
+}
+
+/* Make sure overlay stays *under* the art */
+.hero-overlay { z-index: 0; }
+.hero-bg { z-index: -1; }
+
+/* Responsive tweaks */
+@media (max-width: 1100px) {
+  .hero-content { max-width: min(640px, 58%); }
+  .hero-art { width: clamp(260px, 44vw, 560px); bottom: -6px; }
+}
+@media (max-width: 820px) {
+  .hero-content { max-width: 100%; }
+  .hero-art {
+    opacity: .15;             /* keep it as a subtle background on small screens */
+    right: 0;
+    bottom: -14px;
+    width: min(90%, 560px);
+  }
+}
+
 
 
 
