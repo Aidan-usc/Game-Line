@@ -1,23 +1,28 @@
 <header class="site-header">
-  <div class="logo-container">
-    <img src="assets/img/Phantom_Picks_Logo.png" alt="Phantom Picks Logo" class="site-logo">
+  <!-- LEFT: Brand (Home) -->
+  <a href="index.html" class="brand" aria-label="Phantom Picks Home">
+    <img src="assets/img/Phantom_Picks_Logo.png" alt="Phantom Picks Logo" class="site-logo" />
     <span class="logo-text">Phantom Picks</span>
-  </div>
-  <nav>
-    <a href="index.html">Home</a>
-    <span class="divider"></span>
+  </a>
+
+  <!-- MIDDLE: Primary Nav (with dividers) -->
+  <nav class="primary-nav" aria-label="Primary">
     <a href="mlb.html">MLB</a>
-    <span class="divider"></span>
+    <span class="divider" role="presentation"></span>
     <a href="nfl.html">NFL</a>
-    <span class="divider"></span>
+    <span class="divider" role="presentation"></span>
     <a href="sec.html">SEC</a>
-    <span class="divider"></span>
+    <span class="divider" role="presentation"></span>
     <a href="leaderboard.html">Leaderboard</a>
-    <span class="divider"></span>
-    <div class="wallet">
-      Balance: <span id="wallet-balance">$50</span>
-    </div>
-    <span class="divider"></span>
-    <a href="auth.html">Login</a>
   </nav>
+
+  <!-- RIGHT: Account Area (no dividers) -->
+  <div class="account-area">
+    <div class="wallet" title="Weekly Allowance">
+      <span class="wallet-label">Balance</span>
+      <span class="wallet-amount" id="wallet-balance">$50</span>
+    </div>
+    <a href="auth.html" class="account-link">Login</a>
+    <!-- If logged in later, swap text to “Account” -->
+  </div>
 </header>
