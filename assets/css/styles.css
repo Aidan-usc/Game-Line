@@ -59,6 +59,24 @@ nav a:hover {
   color:white;
 }
 
+.logo-container {
+  display:flex;
+  align-items:center;
+  gap:15px;
+}
+
+.site-logo {
+  height:80px;   /* matches header height */
+  width:auto;
+}
+
+.logo-text {
+  font-family:var(--font-logo);
+  font-size:40px;
+  color:var(--maize);
+}
+
+
 .divider {
   width:2px;
   height:40px;
@@ -102,4 +120,6 @@ nav a:hover {
   padding: 1rem;
   margin-top: 2rem;
 }
+
+
 
