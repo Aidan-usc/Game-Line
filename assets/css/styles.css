@@ -21,41 +21,71 @@ body {
   color:var(--deep);
 }
 
+/* HEADER */
 .site-header {
   display:flex;
-  justify-content:space-between;
   align-items:center;
   background:var(--indigo);
   color:white;
-  padding:1rem 2rem;
+  padding:0 20px;
+  height:100px;
 }
 
-.logo {
-  font-family:var(--font-logo);
-  font-size:1.8rem;
-  color:var(--maize);
+.logo-container {
+  flex-shrink:0;
+}
+
+.site-logo {
+  height:100%;
+  max-height:80px;
+}
+
+nav {
+  display:flex;
+  align-items:center;
+  margin-left:auto;
+  gap:20px;
 }
 
 nav a {
   font-family:var(--font-nav);
-  margin-left:1.5rem;
+  font-size:40px;
+  color:var(--maize);
   text-decoration:none;
-  color:white;
+  padding:0 10px;
 }
 
 nav a:hover {
-  color:var(--maize);
+  color:white;
 }
 
+.divider {
+  width:2px;
+  height:40px;
+  background:var(--deep);
+  margin:0 10px;
+}
+
+.wallet {
+  font-family:var(--font-nav);
+  font-size:28px;
+  color:var(--maize);
+  background:rgba(20,1,22,0.4);
+  padding:5px 15px;
+  border-radius:var(--radius);
+}
+
+/* PAGE CONTENT */
 .page-content {
   padding:2rem;
   margin-right:320px; /* make space for parlay rail */
 }
 
+/* PARLAY RAIL */
 .parlay-rail {
   position:fixed;
   right:0;
-  top:80px;
+  top:100px;
   width:300px;
   background:white;
   border-left:2px solid var(--indigo);
@@ -64,6 +94,7 @@ nav a:hover {
   font-family:var(--font-body);
 }
 
+/* FOOTER */
 .site-footer {
   background: var(--indigo);
   color: white;
