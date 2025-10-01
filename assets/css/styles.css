@@ -94,12 +94,14 @@ body {
   align-items:center;
   gap:8px;
   font-family:var(--font-nav);
-  font-size:16px;                    /* smaller, closer to your screenshots */
-  color:var(--maize);
-  background:rgba(20,1,22,0.35);     /* subtle notch background */
+  font-size:20px;  /* smaller, closer to your screenshots */
+  font-weight: bold;
+  color:var(indigo);
+  background:rgba(255,255,255,0.95);     /* subtle notch background */
   padding:4px 10px;
-  border-radius:12px;                /* smaller than global radius for a tight notch */
+  border-radius:16px;                /* smaller than global radius for a tight notch */
   line-height:1;
+  height:45px;
 }
 
 .wallet-label { opacity:.85; }
@@ -162,4 +164,5 @@ body {
   .logo-text { display:none; }       /* keep just the logo on small screens */
   .page-content { margin-right:0; }  /* optional: hide rail on mobile later */
 }
+
 
