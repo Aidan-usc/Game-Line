@@ -168,7 +168,7 @@ body {
 /* HOME PAGE */
 /* keep header/rail base styles above; these extend the page */
 
-.page-content.no-rail { margin-right: 0; }
+.page-content.no-rail { margin-right: 0; margin-top:-33px; }
 
 /* HERO */
 .hero {
@@ -358,6 +358,7 @@ body {
 @media (max-width: 680px) {
   .card-grid.three { grid-template-columns: 1fr; }
 }
+
 
 
 
