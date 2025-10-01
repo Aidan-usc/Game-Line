@@ -59,7 +59,7 @@ body {
   display:flex;
   align-items:center;
   gap:20px;
-  margin-left:100px;                  /* buffer space after brand */
+  margin-left:60px;                  /* buffer space after brand */
   margin-right:auto;                 /* push account-area to far right */
 }
 
@@ -358,5 +358,6 @@ body {
 @media (max-width: 680px) {
   .card-grid.three { grid-template-columns: 1fr; }
 }
+
 
 
