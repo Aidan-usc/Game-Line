@@ -1,0 +1,73 @@
+:root {
+  --maize:#FFE559;
+  --indigo:#3B1E76;
+  --snow:#FAF0F0;
+  --green:#48C152;
+  --carmine:#9C0C13;
+  --deep:#140116;
+
+  --font-logo:"Nabla", system-ui;
+  --font-nav:"Audiowide", sans-serif;
+  --font-body:"Merriweather", serif;
+
+  --radius:14px;
+  --shadow:0 6px 18px rgba(0,0,0,.12);
+}
+
+body {
+  margin:0;
+  font-family:var(--font-body);
+  background:var(--snow);
+  color:var(--deep);
+}
+
+.site-header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:var(--indigo);
+  color:white;
+  padding:1rem 2rem;
+}
+
+.logo {
+  font-family:var(--font-logo);
+  font-size:1.8rem;
+  color:var(--maize);
+}
+
+nav a {
+  font-family:var(--font-nav);
+  margin-left:1.5rem;
+  text-decoration:none;
+  color:white;
+}
+
+nav a:hover {
+  color:var(--maize);
+}
+
+.page-content {
+  padding:2rem;
+  margin-right:320px; /* make space for parlay rail */
+}
+
+.parlay-rail {
+  position:fixed;
+  right:0;
+  top:80px;
+  width:300px;
+  background:white;
+  border-left:2px solid var(--indigo);
+  box-shadow:var(--shadow);
+  padding:1rem;
+  font-family:var(--font-body);
+}
+
+.site-footer {
+  background: var(--indigo);
+  color: white;
+  text-align: center;
+  padding: 1rem;
+  margin-top: 2rem;
+}
