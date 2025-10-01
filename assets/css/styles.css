@@ -59,16 +59,17 @@ body {
   display:flex;
   align-items:center;
   gap:20px;
-  margin-left:40px;                  /* buffer space after brand */
+  margin-left:100px;                  /* buffer space after brand */
   margin-right:auto;                 /* push account-area to far right */
 }
 
 .primary-nav a {
   font-family:var(--font-nav);
-  font-size:20px;                    /* tweak if you want larger */
+  font-size:25px;                    /* tweak if you want larger */
   color:var(--maize);
   text-decoration:none;
   padding:0 10px;
+  letter-spacing:.1em;
 }
 
 .primary-nav a:hover { color:white; }
@@ -161,3 +162,4 @@ body {
   .logo-text { display:none; }       /* keep just the logo on small screens */
   .page-content { margin-right:0; }  /* optional: hide rail on mobile later */
 }
+
