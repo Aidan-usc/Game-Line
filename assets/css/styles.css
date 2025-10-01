@@ -96,7 +96,7 @@ body {
   font-family:var(--font-nav);
   font-size:20px;  /* smaller, closer to your screenshots */
   font-weight: bold;
-  color:var(indigo);
+  color:var(--indigo);
   background:rgba(255,255,255,0.95);     /* subtle notch background */
   padding:4px 10px;
   border-radius:16px;                /* smaller than global radius for a tight notch */
@@ -358,6 +358,7 @@ body {
 @media (max-width: 680px) {
   .card-grid.three { grid-template-columns: 1fr; }
 }
+
 
 
 
