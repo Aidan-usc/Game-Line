@@ -1,61 +1,76 @@
+/* --- Grid spacing / layout --- */
+.odds-board{
+  /* 3 columns, with bigger gaps horizontally & vertically */
+  grid-template-columns: repeat(3, minmax(0,1fr));
+  gap: 28px 28px; /* vertical | horizontal */
+}
+
 /* --- Game Card Frame --- */
 .game-card{
   background:#fff;
-  border:2px solid var(--indigo);          /* indigo outline */
+  border:2px solid var(--indigo);                 /* indigo outline */
   border-radius:var(--radius);
-  box-shadow:0 6px 18px rgba(0,0,0,.12);   /* base depth */
+  box-shadow:0 10px 24px rgba(20,1,22,.12);       /* stronger base shadow */
   overflow:hidden;
   display:grid;
   grid-template-rows:auto auto 1fr;
   transition:transform .12s ease, box-shadow .2s ease;
+  will-change: transform, box-shadow;
 }
 .game-card:hover{
-  transform:translateY(-2px) scale(1.01);  /* small grow on hover */
-  box-shadow:0 12px 28px rgba(0,0,0,.2);   /* darker shadow on hover */
+  transform:translateY(-3px) scale(1.008);        /* subtle lift + grow */
+  box-shadow:0 18px 36px rgba(20,1,22,.22);       /* darker on hover */
 }
 
-/* --- Shrink overall footprint a touch --- */
-.gc-head{ display:flex; justify-content:space-between; align-items:center;
-  padding:10px 14px; background:#f7f3ff; border-bottom:1px solid #e7e0ff; }
-.gc-dt{ font-size:14px; font-weight:700; opacity:.95; }
-.gc-loc{ font-size:14px; font-weight:600; opacity:.85; }
+/* --- Tighter overall footprint --- */
+.gc-head{
+  display:flex; justify-content:space-between; align-items:center;
+  padding:8px 12px;                                /* smaller */
+  background:#f7f3ff;
+  border-bottom:1px solid #e7e0ff;
+}
+.gc-dt{ font-size:13px; font-weight:700; opacity:.95; }
+.gc-loc{ font-size:13px; font-weight:600; opacity:.85; }
 
-/* --- Center block (logos + city/mascot + @) --- */
 .gc-center{
   display:grid; grid-template-columns:1fr auto 1fr;
-  gap:12px; align-items:center; padding:14px; text-align:center;
+  gap:10px; align-items:center; padding:12px; text-align:center;
 }
-.team{ display:grid; grid-template-rows:auto auto auto; justify-items:center; gap:8px; }
+.team{ display:grid; grid-template-rows:auto auto auto; justify-items:center; gap:6px; }
 .team-logo{
-  width:clamp(64px,8vw,90px);   /* slightly smaller to tighten cards */
-  height:clamp(64px,8vw,90px);
+  /* slightly smaller logos to reduce card height */
+  width:clamp(60px,7vw,82px);
+  height:clamp(60px,7vw,82px);
   object-fit:contain;
   border:none; background:transparent;
-  border-radius:8px;            /* set to 0 if you want hard square */
+  border-radius:8px; /* set 0 if you prefer hard square */
 }
-.team-city{ font-size:14px; line-height:1.1; }
-.team-mascot{ font-size:16px; font-weight:800; line-height:1.05; }
+.team-city{ font-size:13px; line-height:1.1; }
+.team-mascot{ font-size:15px; font-weight:800; line-height:1.05; }
 
 .at{
   font-family:var(--font-nav);
-  font-size:clamp(24px,4vw,40px);
-  opacity:.9; padding:0 8px;
+  font-size:clamp(22px,3.5vw,36px);
+  opacity:.9; padding:0 6px;
 }
 
 /* --- Markets --- */
 .gc-markets{
-  padding:12px 14px; display:grid; gap:12px; border-top:1px dashed #eee; text-align:center;
+  padding:10px 12px; display:grid; gap:10px;
+  border-top:1px dashed #eee; text-align:center;
 }
-.market{ display:grid; gap:10px; }
+.market{ display:grid; gap:8px; }
 
 /* Titles in indigo, heavier */
 .market-label{
-  font-size:15px; font-weight:800; color:var(--indigo);
-  letter-spacing:.04em; text-transform:none; margin-bottom:2px; text-align:center;
+  font-size:14px; font-weight:800; color:var(--indigo);
+  letter-spacing:.04em; text-transform:none; margin-bottom:0; text-align:center;
 }
 
 /* Moneyline row: two equal buttons */
-.ml-row{ display:grid; grid-template-columns:1fr 1fr; gap:12px; align-items:stretch; }
+.ml-row{
+  display:grid; grid-template-columns:1fr 1fr; gap:10px; align-items:stretch;
+}
 
 /* Totals: two columns; label above each button */
 .tot-row{ display:grid; grid-template-columns:1fr 1fr; gap:10px; align-items:start; }
@@ -66,18 +81,19 @@
 /* --- Odds buttons --- */
 .pick-btn{
   display:flex; justify-content:center; align-items:center;
-  width:100%; min-height:46px; padding:10px 12px;
+  width:100%; min-height:42px;                    /* smaller buttons */
+  padding:9px 10px;
   border-radius:12px; border:2px solid #e5e1f5; background:#fbfaff;
-  font-family:var(--font-nav); font-size:16px;
+  font-family:var(--font-nav); font-size:15px;
   cursor:pointer; user-select:none;
 }
 .pick-btn:hover{
-  background:var(--maize);                /* maize on hover */
+  background:var(--maize);                        /* maize on hover */
   color:var(--deep);
   border-color:var(--maize);
 }
 .pick-btn.selected{
-  background:var(--indigo);               /* selected stays indigo */
+  background:var(--indigo);                       /* selected stays indigo */
   color:var(--maize);
   border-color:var(--indigo);
 }
