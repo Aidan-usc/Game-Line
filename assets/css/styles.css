@@ -179,14 +179,30 @@ body {
   min-height: 60vh;
 }
 
+/* Collage anchored to right/bottom + gradient behind it */
 .hero-bg {
-  position:absolute;
-  inset:0;
-  background:
-    url("../img/hero_image.png") center/cover no-repeat,
+  position: absolute;
+  inset: 0;
+
+  /* topmost layer first (collage), gradient behind */
+  background-image:
+    url("../img/hero_image.png"),
     linear-gradient(135deg, var(--indigo), var(--deep));
-  filter: none; /* rely on overlay below for contrast */
+  background-repeat: no-repeat, no-repeat;
+
+  /* SCALE the collage by height; gradient covers */
+  background-size:
+    auto 130%,      /* <-- increase to 130–150% to make image bigger */
+    cover;
+
+  /* POSITION the collage to the right/bottom with small offset */
+  background-position:
+    right 0px bottom -60px,  /* <-- more negative moves it further DOWN */
+    center;
+
+  z-index: -1;
 }
+
 
 .hero-overlay {
   position:absolute;
@@ -359,4 +375,5 @@ body {
 @media (max-width: 680px) {
   .card-grid.three { grid-template-columns: 1fr; }
 }
+
 
