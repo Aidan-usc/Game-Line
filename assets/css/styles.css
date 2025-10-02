@@ -122,22 +122,7 @@ body {
    ========================= */
 .page-content {
   padding:2rem;
-  margin-right:320px; /* space for parlay rail */
-}
-
-/* =========================
-   PARLAY RAIL
-   ========================= */
-.parlay-rail {
-  position:fixed;
-  right:0;
-  top:100px;
-  width:300px;
-  background:white;
-  border-left:2px solid var(--indigo);
-  box-shadow:var(--shadow);
-  padding:1rem;
-  font-family:var(--font-body);
+  margin-right:320px; /* general space (overridden by .page--odds and .no-rail) */
 }
 
 /* =========================
@@ -165,9 +150,9 @@ body {
   .page-content { margin-right:0; }  /* optional: hide rail on mobile later */
 }
 
-/* HOME PAGE */
-/* keep header/rail base styles above; these extend the page */
-
+/* =========================
+   HOME PAGE
+   ========================= */
 .page-content.no-rail { margin-right: 0; margin-top:-33px; }
 
 /* HERO */
@@ -190,14 +175,11 @@ body {
     linear-gradient(135deg, var(--indigo), var(--deep));
   background-repeat: no-repeat, no-repeat;
 
-  /* SCALE the collage by height; gradient covers */
+  /* NOTE: you can tune size/position here later if needed */
   background-size: auto;
-
-  /* POSITION the collage to the right/bottom with small offset */
   background-position: right -110px bottom -500px, center;
   z-index: -1;
 }
-
 
 .hero-overlay {
   position:absolute;
@@ -251,7 +233,6 @@ body {
   font-size: 18px;
   transition: transform .06s ease, opacity .2s ease;
 }
-
 .btn:active { transform: translateY(1px); }
 
 .btn-primary {
@@ -259,7 +240,6 @@ body {
   color: var(--maize);
   border: 2px solid var(--maize);
 }
-
 .btn-primary:hover {
   background: var(--deep);
   color: var(--maize);
@@ -270,10 +250,7 @@ body {
   color: white;
   border: 2px solid rgba(255,255,255,.8);
 }
-
-.btn-ghost:hover {
-  background: rgba(255,255,255,.1);
-}
+.btn-ghost:hover { background: rgba(255,255,255,.1); }
 
 /* SECTIONS */
 .section {
@@ -281,7 +258,6 @@ body {
   max-width: 1200px;
   margin: 0 auto;
 }
-
 .section-title {
   font-family: var(--font-nav);
   font-size: 28px;
@@ -290,14 +266,8 @@ body {
 }
 
 /* CARDS / TILES */
-.card-grid {
-  display: grid;
-  gap: 16px;
-}
-
-.card-grid.three {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
+.card-grid { display: grid; gap: 16px; }
+.card-grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 
 .info-card {
   background: white;
@@ -306,26 +276,18 @@ body {
   padding: 18px 18px 20px;
   border-left: 4px solid var(--indigo);
 }
-
 .info-card h3 {
   margin: 0 0 6px 0;
   font-size: 20px;
   color: var(--indigo);
   font-family: var(--font-nav);
 }
-
-.info-card p {
-  margin: 0;
-  line-height: 1.5;
-}
+.info-card p { margin: 0; line-height: 1.5; }
 
 /* LEAGUE TILES */
 .league-tile {
-  display:flex;
-  flex-direction:column;
-  justify-content:space-between;
-  gap: 8px;
-  padding: 20px;
+  display:flex; flex-direction:column; justify-content:space-between;
+  gap: 8px; padding: 20px;
   background: linear-gradient(180deg, white, #fff7);
   border: 2px solid var(--indigo);
   border-radius: var(--radius);
@@ -333,17 +295,8 @@ body {
   box-shadow: var(--shadow);
   min-height: 140px;
 }
-
-.league-acronym {
-  font-family: var(--font-nav);
-  font-size: 36px;
-  color: var(--indigo);
-}
-
-.league-cta {
-  font-family: var(--font-body);
-  color: var(--deep);
-}
+.league-acronym { font-family: var(--font-nav); font-size: 36px; color: var(--indigo); }
+.league-cta { font-family: var(--font-body); color: var(--deep); }
 
 /* CTA */
 .section-cta .cta-card {
@@ -354,23 +307,16 @@ body {
   padding: 26px;
   text-align: center;
 }
-
-.section-cta h2 {
-  margin: 0 0 8px 0;
-}
-
-.section-cta p {
-  margin: 0 0 16px 0;
-}
+.section-cta h2 { margin: 0 0 8px 0; }
+.section-cta p { margin: 0 0 16px 0; }
 
 /* RESPONSIVE TWEAKS */
-@media (max-width: 1024px) {
-  .card-grid.three { grid-template-columns: 1fr 1fr; }
-}
-@media (max-width: 680px) {
-  .card-grid.three { grid-template-columns: 1fr; }
-}
+@media (max-width: 1024px) { .card-grid.three { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 680px)  { .card-grid.three { grid-template-columns: 1fr; } }
 
+/* =========================
+   LEAGUE PAGES
+   ========================= */
 
 /* ===== League Banner ===== */
 .league-banner {
@@ -379,10 +325,7 @@ body {
   box-shadow: var(--shadow);
   overflow: hidden;
 }
-.league-banner .banner-inner {
-  padding: 18px 20px;
-  color: white;
-}
+.league-banner .banner-inner { padding: 18px 20px; color: white; }
 .league-banner h1 {
   margin: 0 0 4px 0;
   font-family: var(--font-nav);
@@ -391,13 +334,13 @@ body {
 }
 .league-banner p { margin: 0; }
 
-/* Variants (feel free to tweak gradients) */
+/* Variants */
 .league-mlb { background: linear-gradient(90deg, #2f0f6a, #140116); }
 .league-nfl { background: linear-gradient(90deg, #2c1559, #0f0a2b); }
 .league-sec { background: linear-gradient(90deg, #3b1e76, #140116); }
 
 /* ===== Odds Layout ===== */
-.page--odds { margin-right: 360px; }     /* extra space for a wider rail */
+.page--odds { margin-right: 360px; }     /* leaves space so content doesn't sit under the rail */
 .odds-layout { position: relative; }
 .odds-board {
   display: grid;
@@ -413,67 +356,113 @@ body {
   border: 2px solid rgba(0,0,0,0.06);
   overflow: hidden;
 }
-
 .gc-head {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:10px 14px;
-  background: #f7f3ff;
-  border-bottom:1px solid #e7e0ff;
+  display:flex; justify-content:space-between; align-items:center;
+  padding:10px 14px; background: #f7f3ff; border-bottom:1px solid #e7e0ff;
 }
 .gc-time { font-size: 12px; opacity:.8; }
 .gc-matchup { font-family: var(--font-nav); font-size: 18px; color: var(--indigo); }
-
 .gc-body { display:grid; grid-template-columns: 1fr 1fr; gap:10px; padding:12px; }
 
 .pick-btn {
   display:flex; justify-content:center; align-items:center;
-  padding:10px 8px;
-  border-radius: 12px;
-  border:2px solid #e5e1f5;
-  background:#fbfaff;
-  font-family: var(--font-nav);
-  font-size:16px;
-  cursor:pointer;
-  user-select:none;
+  padding:10px 8px; border-radius: 12px;
+  border:2px solid #e5e1f5; background:#fbfaff;
+  font-family: var(--font-nav); font-size:16px;
+  cursor:pointer; user-select:none;
 }
 .pick-btn small { margin-left:6px; opacity:.8; font-family: var(--font-body); }
 .pick-btn:hover { border-color: var(--indigo); }
 .pick-btn.selected { background: var(--indigo); color: var(--maize); border-color: var(--indigo); }
 
-.gc-footer { display:grid; grid-template-columns: 1fr 1fr; gap:10px; padding:12px; border-top:1px dashed #eee; }
-
+.gc-footer {
+  display:grid; grid-template-columns: 1fr 1fr; gap:10px;
+  padding:12px; border-top:1px dashed #eee;
+}
 .market-label { font-size:12px; opacity:.7; display:block; margin-bottom:4px; }
 
-/* ===== Right Rail (sticky) ===== */
+/* =========================
+   RIGHT RAIL (full-height, bottom-pinned widget)
+   ========================= */
 .parlay-rail {
+  /* outer placement: keep ~10–18px gap around */
   position: fixed;
-  top: 110px;
+  top: 110px;           /* header ≈100px */
   right: 18px;
+  bottom: 16px;         /* small gap above bottom edge */
   width: 330px;
+
   background: white;
   border-left: 2px solid var(--indigo);
   border-radius: 14px;
   box-shadow: var(--shadow);
   padding: 12px;
-  max-height: calc(100vh - 130px);
-  overflow:auto;
-}
-.rail-title { font-family: var(--font-nav); font-size: 22px; margin: 2px 0 8px; color: var(--indigo); }
-.rail-subtitle { font-family: var(--font-nav); font-size: 18px; margin: 10px 0 6px; }
-.rail-note { font-size: 12px; opacity:.7; margin: 8px 0 0; }
 
-.rail-section + .rail-section { margin-top: 16px; }
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;     /* the rail itself never scrolls */
+}
+
+.rail-header { flex: 0 0 auto; }
+.rail-title {
+  font-family: var(--font-nav);
+  font-size: 22px;
+  margin: 2px 0 8px;
+  color: var(--indigo);
+}
+
+/* Scrollable middle area; footer overlays it */
+:root { --rail-footer-h: 180px; }   /* reserved height for bottom widget (parlay mode) */
+.rail-scroll {
+  position: relative;
+  flex: 1 1 auto;
+  overflow: auto;
+  padding-right: 6px;               /* room for scrollbar */
+}
+
+/* subtle fade where content passes under the footer */
+.rail-scroll::after {
+  content: "";
+  position: sticky;
+  bottom: 0;
+  display: block;
+  height: 24px;
+  margin-top: -24px;
+  background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,1));
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Bottom widget pinned inside the rail */
+.rail-footer {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  padding-top: 10px;
+  background: white;
+  z-index: 2;                       /* above the scrolling legs */
+  border-top: 1px dashed #eae6ff;
+  box-shadow: 0 -6px 18px rgba(0,0,0,.06);
+  border-radius: 0 0 12px 12px;
+}
+
+/* Summary / inputs / buttons */
+.rail-summary { display:grid; gap:8px; margin-bottom: 8px; }
+.rail-summary > div { display:flex; justify-content:space-between; align-items:center; }
+.wager-row { gap:10px; }
+#wager {
+  width: 120px; padding: 8px 10px; border-radius:10px; border:1px solid #e1dbff;
+  font-family: var(--font-body); font-size:16px;
+}
+.btn-block { width:100%; margin-top:8px; }
 
 /* Legs list */
 .legs { list-style: none; padding: 0; margin: 0; }
 .leg {
-  display:flex; justify-content:space-between; gap:8px;
-  align-items:flex-start;
-  background:#fbfaff;
-  border:1px solid #ebe6ff;
-  border-radius:12px; padding:8px 10px; margin-bottom:8px;
+  display:flex; justify-content:space-between; gap:8px; align-items:flex-start;
+  background:#fbfaff; border:1px solid #ebe6ff; border-radius:12px;
+  padding:8px 10px; margin-bottom:8px;
 }
 .leg .meta { font-size:12px; opacity:.75; }
 .leg .title { font-family: var(--font-nav); font-size:14px; }
@@ -481,20 +470,43 @@ body {
 .leg .remove { cursor:pointer; opacity:.6; }
 .leg .remove:hover { opacity:1; }
 
-/* Rail summary */
-.rail-summary { margin-top: 8px; border-top:1px dashed #eae6ff; padding-top:10px; display:grid; gap:8px; }
-.rail-summary > div { display:flex; justify-content:space-between; align-items:center; }
-.wager-row { gap:10px; }
-#wager {
-  width: 120px; padding: 8px 10px; border-radius:10px; border:1px solid #e1dbff;
-  font-family: var(--font-body); font-size:16px;
+/* Bets-in-play empty state */
+.bets .empty {
+  font-size: 14px;
+  opacity: .7;
+  padding: 10px;
+  border: 1px dashed #eae6ff;
+  border-radius: 10px;
+  background: #fbfaff;
 }
 
-.btn-block { width:100%; margin-top:8px; }
+/* Mode toggles: Bets vs Parlay */
+.parlay-rail.mode-bets #parlay-legs { display: none; }
+.parlay-rail.mode-bets #bets-container { display: block; }
+.parlay-rail.mode-bets .rail-footer { display: none; }
+/* no extra padding-bottom in bets mode */
+.parlay-rail.mode-parlay #parlay-legs { display: block; }
+.parlay-rail.mode-parlay #bets-container { display: none; }
+.parlay-rail.mode-parlay .rail-footer { display: block; }
+.parlay-rail.mode-parlay .rail-scroll { padding-bottom: var(--rail-footer-h); }
 
-/* Responsive */
+/* Responsive: rail collapses into flow under odds board */
 @media (max-width: 1100px){
-  .odds-board { grid-template-columns: 1fr; }
   .page--odds { margin-right: 0; }
-  .parlay-rail { position: static; width: 100%; right: auto; top: auto; max-height: none; margin-top: 12px; }
+  .odds-board { grid-template-columns: 1fr; }
+
+  .parlay-rail {
+    position: static;
+    width: 100%;
+    right: auto; top: auto; bottom: auto;
+    max-height: none;
+    margin-top: 12px;
+  }
+  .rail-footer {
+    position: static;
+    left: 0; right: 0; bottom: auto;
+    box-shadow: none;
+    border-top: 1px dashed #eae6ff;
+  }
+  .parlay-rail.mode-parlay .rail-scroll { padding-bottom: 0; }
 }
