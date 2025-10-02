@@ -67,10 +67,12 @@
   letter-spacing:.04em; text-transform:none; margin-bottom:0; text-align:center;
 }
 
-/* Moneyline row: two equal buttons */
-.ml-row{
-  display:grid; grid-template-columns:1fr 1fr; gap:10px; align-items:stretch;
-}
+/* Moneyline row: two columns with labels above buttons */
+.ml-row { display:grid; grid-template-columns: 1fr 1fr; gap:10px; align-items:start; }
+.ml-col { display:grid; gap:6px; justify-items:center; }  /* centers label + button */
+
+/* You already have this; reusing for both ML & Totals labels */
+.side-label { text-align:center; font-weight:700; }
 
 /* Totals: two columns; label above each button */
 .tot-row{ display:grid; grid-template-columns:1fr 1fr; gap:10px; align-items:start; }
