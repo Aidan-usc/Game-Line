@@ -152,7 +152,6 @@ async function renderLiveOdds(sport) {
   </div>
 </div>
 
-
 </div>
 
     </article>`;
@@ -343,6 +342,7 @@ async function renderLiveOdds(sport) {
     ];
   }
 })();
+
 
 
 
