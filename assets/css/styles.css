@@ -6,6 +6,8 @@
   --carmine:#9C0C13;
   --deep:#140116;
 
+  --header-h: 100px;
+
   --font-logo:"Nabla", system-ui;
   --font-nav:"Audiowide", sans-serif;
   --font-body:"Merriweather", serif;
@@ -19,20 +21,33 @@ body {
   font-family:var(--font-body);
   background:var(--snow);
   color:var(--deep);
+  padding-top: var(--header-h);  
 }
 
 /* =========================
    HEADER (3-block layout)
    ========================= */
 .site-header {
+  position: fixed;      /* <-- make it permanent at the top */
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+
   display:flex;
   align-items:center;
-  justify-content:space-between;     /* brand | primary-nav | account-area */
+  justify-content:space-between;
   background:var(--indigo);
   color:white;
   padding:0 20px;
-  height:100px;
+  height: var(--header-h);
 }
+
+/* subtle shadow once the page scrolls */
+.site-header.scrolled {
+  box-shadow: var(--shadow);
+}
+
 
 /* LEFT: Brand (logo + text as a single home link) */
 .brand {
@@ -510,3 +525,4 @@ body {
   }
   .parlay-rail.mode-parlay .rail-scroll { padding-bottom: 0; }
 }
+
