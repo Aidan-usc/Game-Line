@@ -3,28 +3,30 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SEC Odds – Phantom Picks</title>
+  <title>CFB Odds – Phantom Picks</title>
 
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Nabla&family=Audiowide&family=Merriweather&display=swap" rel="stylesheet">
 
   <!-- CSS -->
   <link rel="stylesheet" href="assets/css/styles.css?v=odds3">
-  <link rel="stylesheet" href="assets/css/cards.css?v=1">
+  <link rel="stylesheet" href="assets/css/cards.css?v=5">
 </head>
 <body>
   <!-- header/footer are injected -->
   <div id="header"></div>
 
-  <!-- IMPORTANT: data-sport drives which odds we fetch -->
   <main class="page-content page--odds" data-sport="sec">
-    <!-- Banner -->
+    <!-- Banner (UI says CFB, code keeps 'sec' for the page key) -->
     <section class="league-banner league-sec">
       <div class="banner-inner">
-        <h1>SEC</h1>
-        <p>Moneyline &amp; Totals. Build your parlay on the right.</p>
+        <h1>CFB</h1>
+        <p>Power-4 + Notre Dame • Moneyline &amp; Totals. Build your parlay on the right.</p>
       </div>
     </section>
+
+    <!-- Filters (conference + search + refresh) -->
+    <section id="filters" class="filter-bar"></section>
 
     <!-- Odds board + right rail mount -->
     <div class="odds-layout">
@@ -38,14 +40,23 @@
   <!-- JS: order matters -->
   <script src="js/app.js?v=2"></script>
 
-  <!-- (Optional) keep your API key out of odds.js -->
-  <!-- <script src="js/config.js"></script> -->
+  <!-- API key (if you use config.js) -->
+  <!-- <script src="js/config.js?v=1"></script> -->
 
+  <!-- Metadata for divisions/conferences (includes Power-4 + ND) -->
+  <script src="js/meta.js?v=1"></script>
+
+  <!-- Logos (your local mapping) -->
   <script src="js/logos.js?v=1"></script>
-  <script src="js/odds.js?v=1"></script>
-  <script src="js/parlay.js?v=6"></script>
+
+  <!-- Odds service (with filters + variable caching) -->
+  <script src="js/odds.js?v=2"></script>
+
+  <!-- Parlay UI (renderBoard + reRenderOdds patched) -->
+  <script src="js/parlay.js?v=7"></script>
+
   <script>
-    // Init after rail partial is injected
+    // Init after the rail partial is injected
     window.addEventListener('rail:ready', () => {
       const sport = document.querySelector('.page--odds')?.dataset?.sport || 'sec';
       window.initParlayPage && window.initParlayPage(sport);
