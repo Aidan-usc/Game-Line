@@ -137,16 +137,20 @@ async function renderLiveOdds(sport) {
           </div>
         </div>
 
-        <div class="market tot">
-          <div class="market-label">Totals</div>
-          <div class="tot-row">
-            <div class="side-label">Under</div>
-            ${pickBtn({g, a, h, market:"tot", selection:"under", label:`Under ${g.total}`, odds:g.under, line:g.total})}
-            <div class="side-label">Over</div>
-            ${pickBtn({g, a, h, market:"tot", selection:"over", label:`Over ${g.total}`, odds:g.over, line:g.total})}
-          </div>
-        </div>
-      </div>
+<div class="market tot">
+  <div class="market-label">Totals</div>
+  <div class="tot-row">
+    <div class="tot-col">
+      <div class="side-label">Under</div>
+      ${pickBtn({g, a, h, market:"tot", selection:"under", label:`Under ${g.total}`, odds:g.under, line:g.total})}
+    </div>
+    <div class="tot-col">
+      <div class="side-label">Over</div>
+      ${pickBtn({g, a, h, market:"tot", selection:"over", label:`Over ${g.total}`, odds:g.over, line:g.total})}
+    </div>
+  </div>
+</div>
+
     </article>`;
   }
 
@@ -335,4 +339,5 @@ async function renderLiveOdds(sport) {
     ];
   }
 })();
+
 
