@@ -3,44 +3,53 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SEC Odds – Phantom Picks</title>
+  <title>MLB Odds – Phantom Picks</title>
+
+  <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Nabla&family=Audiowide&family=Merriweather&display=swap" rel="stylesheet">
+
+  <!-- CSS -->
   <link rel="stylesheet" href="assets/css/styles.css?v=odds3">
   <link rel="stylesheet" href="assets/css/cards.css?v=1">
 </head>
 <body>
+  <!-- header/footer are injected -->
   <div id="header"></div>
 
+  <!-- IMPORTANT: data-sport drives which odds we fetch -->
   <main class="page-content page--odds" data-sport="sec">
+    <!-- Banner -->
     <section class="league-banner league-sec">
       <div class="banner-inner">
-        <h1>SEC Football</h1>
+        <h1>SEC</h1>
         <p>Moneyline &amp; Totals. Build your parlay on the right.</p>
       </div>
     </section>
 
+    <!-- Odds board + right rail mount -->
     <div class="odds-layout">
       <section id="odds-board" class="odds-board" aria-live="polite"></section>
-
       <div id="rail"></div>
-
     </div>
   </main>
 
   <div id="footer"></div>
 
-<script src="js/app.js?v=2"></script>
-<script src="js/logos.js?v=1"></script>
-<script src="js/odds.js?v=1"></script>
-<script src="js/parlay.js?v=6"></script>
+  <!-- JS: order matters -->
+  <script src="js/app.js?v=2"></script>
 
-<script>
-  window.addEventListener('rail:ready', function () {
-    const sport = document.querySelector('.page--odds')?.dataset?.sport || 'sec';
-    window.initParlayPage && window.initParlayPage(sport);
-  });
-</script>
+  <!-- (Optional) keep your API key out of odds.js -->
+  <!-- <script src="js/config.js"></script> -->
 
-
+  <script src="js/logos.js?v=1"></script>
+  <script src="js/odds.js?v=1"></script>
+  <script src="js/parlay.js?v=6"></script>
+  <script>
+    // Init after rail partial is injected
+    window.addEventListener('rail:ready', () => {
+      const sport = document.querySelector('.page--odds')?.dataset?.sport || 'sec';
+      window.initParlayPage && window.initParlayPage(sport);
+    });
+  </script>
 </body>
 </html>
