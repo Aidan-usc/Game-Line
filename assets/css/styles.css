@@ -203,6 +203,7 @@ body {
   position: relative;
   z-index: 1;
   padding: 64px 24px;
+  padding-right: 590px;
   max-width: 1200px;
   margin: 0 auto;
   color: white;
@@ -358,4 +359,5 @@ body {
 @media (max-width: 680px) {
   .card-grid.three { grid-template-columns: 1fr; }
 }
+
 
