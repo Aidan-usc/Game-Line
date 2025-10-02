@@ -72,7 +72,13 @@
 .ml-col { display:grid; gap:6px; justify-items:center; }  /* centers label + button */
 
 /* You already have this; reusing for both ML & Totals labels */
-.side-label { text-align:center; font-weight:700; }
+.side-label{
+  text-align:center;
+  font-weight:700;               /* keep bold, but smaller size */
+  font-size: clamp(12px, 1.3vw, 15px);
+  line-height: 1.1;
+  opacity: .9;                   /* optional: a hair softer */
+}
 
 /* Totals: two columns; label above each button */
 .tot-row{ display:grid; grid-template-columns:1fr 1fr; gap:10px; align-items:start; }
