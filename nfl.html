@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>NFL Odds – Phantom Picks</title>
+  <title>MLB Odds – Phantom Picks</title>
 
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Nabla&family=Audiowide&family=Merriweather&display=swap" rel="stylesheet">
@@ -17,14 +17,17 @@
   <div id="header"></div>
 
   <!-- IMPORTANT: data-sport drives which odds we fetch -->
-  <main class="page-content page--odds" data-sport="nfl">
+  <main class="page-content page--odds" data-sport="mlb">
     <!-- Banner -->
-    <section class="league-banner league-nfl">
+    <section class="league-banner league-mlb">
       <div class="banner-inner">
-        <h1>NFL</h1>
+        <h1>MLB</h1>
         <p>Moneyline &amp; Totals. Build your parlay on the right.</p>
       </div>
     </section>
+
+    <!-- Filters (dropdown + search + refresh) -->
+    <section id="filters" class="filter-bar"></section>
 
     <!-- Odds board + right rail mount -->
     <div class="odds-layout">
@@ -38,8 +41,11 @@
   <!-- JS: order matters -->
   <script src="js/app.js?v=2"></script>
 
-  <!-- (Optional) keep your API key out of odds.js -->
-  <!-- <script src="js/config.js"></script> -->
+  <!-- If you're keeping the API key out of odds.js, include config.js here -->
+  <!-- <script src="js/config.js?v=1"></script> -->
+
+  <!-- These two should be present if you added division/conference maps -->
+  <!-- <script src="js/meta.js?v=1"></script> -->
 
   <script src="js/logos.js?v=1"></script>
   <script src="js/odds.js?v=1"></script>
@@ -47,7 +53,7 @@
   <script>
     // Init after rail partial is injected
     window.addEventListener('rail:ready', () => {
-      const sport = document.querySelector('.page--odds')?.dataset?.sport || 'nfl';
+      const sport = document.querySelector('.page--odds')?.dataset?.sport || 'mlb';
       window.initParlayPage && window.initParlayPage(sport);
     });
   </script>
