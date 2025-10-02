@@ -42,4 +42,15 @@
 
   function updateWalletDisplay(balance) {
     const el = document.getElementById("wallet-balance");
-    if
+    if (el) el.textContent = `$${Number(balance).toFixed(2)}`;
+  }
+
+  // Fixed-header shadow
+  window.addEventListener("scroll", () => {
+    const hdr = document.querySelector(".site-header");
+    if (!hdr) return;
+    hdr.classList.toggle("scrolled", window.scrollY > 2);
+  });
+
+  window.addEventListener("DOMContentLoaded", loadAllPartials);
+})();
