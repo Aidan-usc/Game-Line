@@ -51,11 +51,35 @@
     titleEl = document.getElementById("rail-title");
     setRailMode("bets"); // default view
 
-    renderMockOdds(sport); // TODO: swap with live odds
+renderLiveOdds(sport).catch(err => {
+  console.warn("Live odds failed, falling back to mock:", err);
+  renderMockOdds(sport);
+});
+
     hookRail();
     updateRail();
   };
 
+async function renderLiveOdds(sport) {
+  if (!window.OddsService) throw new Error("OddsService missing");
+  const data = await window.OddsService.getOddsFor(sport);
+  const board = document.getElementById("odds-board");
+  if (!board) return;
+
+  board.innerHTML = data.map(renderGameCard).join("");
+
+  // attach click handlers
+  board.querySelectorAll(".pick-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const payload = JSON.parse(btn.dataset.payload);
+      toggleLeg(payload);
+      markSelections(payload);
+      updateRail();
+    });
+  });
+}
+
+  
   // ----- Render odds (mock for now) -----
   function renderMockOdds(sport) {
     const data = getMockData(sport);
@@ -311,3 +335,4 @@
     ];
   }
 })();
+
