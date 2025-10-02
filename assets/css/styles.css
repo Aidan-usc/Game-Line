@@ -360,4 +360,26 @@ body {
   .card-grid.three { grid-template-columns: 1fr; }
 }
 
+/* --- HERO ART POSITION TUNING --- */
+/* More negative = pushes the image further DOWN */
+.hero {
+  --hero-art-bottom: -90px;             /* try -70px .. -120px to taste */
+  --hero-art-right: clamp(16px, 6vw, 60px);
+  min-height: 66vh;                     /* a little taller so faces fit */
+}
+
+.hero-art {
+  right: var(--hero-art-right);
+  bottom: var(--hero-art-bottom);
+}
+
+/* Responsive nudges so it still looks good on smaller screens */
+@media (max-width: 1100px) {
+  .hero { --hero-art-bottom: -50px; }
+}
+
+@media (max-width: 820px) {
+  .hero { --hero-art-bottom: -14px; }   /* we fade the art on mobile anyway */
+}
+
 
