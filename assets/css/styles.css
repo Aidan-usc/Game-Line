@@ -191,15 +191,10 @@ body {
   background-repeat: no-repeat, no-repeat;
 
   /* SCALE the collage by height; gradient covers */
-  background-size:
-    auto 230%,      /* <-- increase to 130–150% to make image bigger */
-    cover;
+  background-size: auto;
 
   /* POSITION the collage to the right/bottom with small offset */
-  background-position:
-    right 0px bottom -60px,  /* <-- more negative moves it further DOWN */
-    center;
-
+  background-position: right -110px bottom -500px, center;
   z-index: -1;
 }
 
@@ -375,6 +370,7 @@ body {
 @media (max-width: 680px) {
   .card-grid.three { grid-template-columns: 1fr; }
 }
+
 
 
 
