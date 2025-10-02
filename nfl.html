@@ -21,7 +21,7 @@
     <!-- Banner -->
     <section class="league-banner league-nfl">
       <div class="banner-inner">
-        <h1>MLB</h1>
+        <h1>NFL</h1>
         <p>Moneyline &amp; Totals. Build your parlay on the right.</p>
       </div>
     </section>
@@ -47,7 +47,7 @@
   <script>
     // Init after rail partial is injected
     window.addEventListener('rail:ready', () => {
-      const sport = document.querySelector('.page--odds')?.dataset?.sport || 'mlb';
+      const sport = document.querySelector('.page--odds')?.dataset?.sport || 'nfl';
       window.initParlayPage && window.initParlayPage(sport);
     });
   </script>
