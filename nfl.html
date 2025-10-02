@@ -21,30 +21,40 @@
     <div class="odds-layout">
       <section id="odds-board" class="odds-board" aria-live="polite"></section>
 
-      <aside class="parlay-rail" id="parlay-rail" aria-label="Parlay Builder">
-        <div class="rail-section">
-          <h2 class="rail-title">Build a Parlay</h2>
-          <ul id="parlay-legs" class="legs"></ul>
+<aside class="parlay-rail mode-bets" id="parlay-rail" aria-label="Parlay">
+  <div class="rail-header">
+    <h2 class="rail-title" id="rail-title">Bets in Play</h2>
+  </div>
 
-          <div class="rail-summary">
-            <div><span>Total Odds</span><strong id="total-odds">+0</strong></div>
-            <div class="wager-row">
-              <label for="wager">Wager (USD)</label>
-              <input id="wager" type="number" min="1" value="10" />
-            </div>
-            <div><span>Projected Payout</span><strong id="payout">$0.00</strong></div>
-          </div>
+  <!-- Scrollable middle area -->
+  <div class="rail-scroll" id="rail-scroll">
+    <!-- PARLAY LEGS (hidden in bets mode) -->
+    <ul id="parlay-legs" class="legs"></ul>
 
-          <button id="submit-parlay" class="btn btn-primary btn-block" disabled>Submit Parlay</button>
-          <button id="clear-parlay" class="btn btn-ghost btn-block">Clear</button>
-          <p class="rail-note">Max 10 legs • Moneyline &amp; O/U only</p>
-        </div>
+    <!-- BETS IN PLAY (visible in bets mode) -->
+    <div id="bets-container">
+      <ul id="bets-in-play" class="bets">
+        <li class="empty">No bets in play yet.</li>
+      </ul>
+    </div>
+  </div>
 
-        <div class="rail-section">
-          <h3 class="rail-subtitle">Bets in Play</h3>
-          <ul id="bets-in-play" class="bets"></ul>
-        </div>
-      </aside>
+  <!-- Bottom widget (only visible in parlay mode) -->
+  <div class="rail-footer" id="rail-footer">
+    <div class="rail-summary">
+      <div><span>Total Odds</span><strong id="total-odds">+0</strong></div>
+      <div class="wager-row">
+        <label for="wager">Wager (USD)</label>
+        <input id="wager" type="number" min="1" value="10" />
+      </div>
+      <div><span>Projected Payout</span><strong id="payout">$0.00</strong></div>
+    </div>
+
+    <button id="submit-parlay" class="btn btn-primary btn-block" disabled>Submit Parlay</button>
+    <button id="clear-parlay" class="btn btn-ghost btn-block">Clear</button>
+  </div>
+</aside>
+
     </div>
   </main>
 
