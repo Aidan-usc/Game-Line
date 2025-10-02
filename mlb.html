@@ -1,23 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MLB - Phantom Picks</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MLB Odds – Phantom Picks</title>
   <link href="https://fonts.googleapis.com/css2?family=Nabla&family=Audiowide&family=Merriweather&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
   <div id="header"></div>
 
-  <main class="page-content">
-    <h1>MLB Odds</h1>
-    <p>Odds grid will load here.</p>
-    <div class="parlay-rail">Parlay Rail Placeholder</div>
+  <main class="page-content page--odds" data-sport="mlb">
+    <!-- League Banner -->
+    <section class="league-banner league-mlb">
+      <div class="banner-inner">
+        <h1>MLB</h1>
+        <p>Moneyline &amp; Totals. Build your parlay on the right.</p>
+      </div>
+    </section>
+
+    <!-- Layout: odds board + right rail -->
+    <div class="odds-layout">
+      <section id="odds-board" class="odds-board" aria-live="polite">
+        <!-- JS will render cards here -->
+      </section>
+
+      <aside class="parlay-rail" id="parlay-rail" aria-label="Parlay Builder">
+        <div class="rail-section">
+          <h2 class="rail-title">Build a Parlay</h2>
+          <ul id="parlay-legs" class="legs"></ul>
+
+          <div class="rail-summary">
+            <div><span>Total Odds</span><strong id="total-odds">+0</strong></div>
+            <div class="wager-row">
+              <label for="wager">Wager (USD)</label>
+              <input id="wager" type="number" min="1" value="10" />
+            </div>
+            <div><span>Projected Payout</span><strong id="payout">$0.00</strong></div>
+          </div>
+
+          <button id="submit-parlay" class="btn btn-primary btn-block" disabled>Submit Parlay</button>
+          <button id="clear-parlay" class="btn btn-ghost btn-block">Clear</button>
+          <p class="rail-note">Max 10 legs • Moneyline &amp; O/U only</p>
+        </div>
+
+        <div class="rail-section">
+          <h3 class="rail-subtitle">Bets in Play</h3>
+          <ul id="bets-in-play" class="bets"></ul>
+        </div>
+      </aside>
+    </div>
   </main>
 
   <div id="footer"></div>
+
   <script src="js/app.js"></script>
+  <script type="module">
+    import { initParlayPage } from "./js/parlay.js";
+    // Render with mock data for now; swap to odds.js later
+    initParlayPage("mlb");
+  </script>
 </body>
 </html>
-
