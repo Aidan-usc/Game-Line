@@ -1,7 +1,7 @@
 // js/odds.js
 (function () {
   const API = "https://api.the-odds-api.com/v4";
-  const KEY = window.ODDS_API_KEY || "";
+  const KEY = window.ODDS_API_KEY || "85bd97903b7fe6cc8850b02f70e25ade";
   const REGIONS = "us";
   const MARKETS = "h2h,totals";
   const ODDS_FMT = "american";
@@ -226,3 +226,4 @@
   // Expose
   window.OddsService = { getOddsFor };
 })();
+
