@@ -30,6 +30,11 @@ function renderBoard(data){
   });
 }
 
+  // expose a safe re-render function for odds.js filters
+window.reRenderOdds = function (list) {
+  renderBoard(list);
+};
+
   
   // Split "City Words Mascot" into {city, mascot} (mascot = last word)
   function splitCityMascot(full) {
@@ -356,6 +361,7 @@ async function renderLiveOdds(sport) {
 window.reRenderOdds = function(list){
   renderBoard(list);
 };
+
 
 
 
