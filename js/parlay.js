@@ -121,7 +121,11 @@ async function renderLiveOdds(sport) {
 
       <div class="gc-center">
         <div class="team team-away">
-          <img class="team-logo" src="${g.awayLogo || 'assets/img/logos/_placeholder.png'}" alt="${g.awayFull} logo" onerror="this.src='assets/img/logos/_placeholder.png'">
+          <img class="team-logo"
+     src="${g.awayLogo || (window.LogoFinder && window.LogoFinder.placeholder && window.LogoFinder.placeholder()) || ''}"
+     alt="${g.awayFull} logo"
+     onerror="this.onerror=null; this.src=(window.LogoFinder && window.LogoFinder.placeholder && window.LogoFinder.placeholder()) || ''">
+
           <div class="team-city">${a.city}</div>
           <div class="team-mascot">${a.mascot}</div>
         </div>
@@ -129,7 +133,10 @@ async function renderLiveOdds(sport) {
         <div class="at">@</div>
 
         <div class="team team-home">
-          <img class="team-logo" src="${g.homeLogo || 'assets/img/logos/_placeholder.png'}" alt="${g.homeFull} logo" onerror="this.src='assets/img/logos/_placeholder.png'">
+          <img class="team-logo"
+     src="${g.homeLogo || (window.LogoFinder && window.LogoFinder.placeholder && window.LogoFinder.placeholder()) || ''}"
+     alt="${g.homeFull} logo"
+     onerror="this.onerror=null; this.src=(window.LogoFinder && window.LogoFinder.placeholder && window.LogoFinder.placeholder()) || ''">
           <div class="team-city">${h.city}</div>
           <div class="team-mascot">${h.mascot}</div>
         </div>
@@ -361,6 +368,7 @@ async function renderLiveOdds(sport) {
 window.reRenderOdds = function(list){
   renderBoard(list);
 };
+
 
 
 
