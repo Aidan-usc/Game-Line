@@ -47,3 +47,12 @@ window.addEventListener("DOMContentLoaded", async () => {
   await loadAllPartials();
   updateWalletDisplay();
 });
+
+// add a soft shadow to the fixed header once the page scrolls
+window.addEventListener("scroll", () => {
+  const hdr = document.querySelector(".site-header");
+  if (!hdr) return;
+  hdr.classList.toggle("scrolled", window.scrollY > 2);
+});
+
+
