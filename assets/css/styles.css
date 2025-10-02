@@ -559,3 +559,25 @@ body {
 
 
 
+
+/* --- Filter bar --- */
+.filter-bar{
+  display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between;
+  gap:10px; margin: 8px auto 18px; max-width:1200px; padding:8px 12px;
+  background:#fff; border:2px solid var(--indigo); border-radius:var(--radius); box-shadow:var(--shadow);
+}
+
+.filter-left, .filter-right{ display:flex; align-items:center; gap:10px; }
+
+.filter-select, .filter-search{
+  font-family: var(--font-body);
+  font-size:14px; line-height:1;
+  border:1px solid #e1dbff; border-radius:10px; padding:8px 10px; background:#fbfaff;
+}
+.filter-search{ min-width: 220px; }
+
+.filter-refresh{
+  background:transparent; border:none; color:var(--indigo); cursor:pointer;
+  font-family:var(--font-nav); font-size:14px; text-decoration:underline; padding:6px 8px;
+}
+.filter-refresh:hover{ color:var(--deep); }
