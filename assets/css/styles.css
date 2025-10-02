@@ -168,7 +168,7 @@ body {
 /* =========================
    HOME PAGE
    ========================= */
-.page-content.no-rail { margin-right: 0; margin-top:-33px; }
+.page-content.no-rail { margin-right: 0; margin-top:0; }
 
 /* HERO */
 .hero {
@@ -402,7 +402,7 @@ body {
 .parlay-rail {
   /* outer placement: keep ~10–18px gap around */
   position: fixed;
-  top: 110px;           /* header ≈100px */
+  top: calc(var(--header-h) + 10px);            /* header ≈100px */
   right: 18px;
   bottom: 16px;         /* small gap above bottom edge */
   width: 330px;
@@ -525,4 +525,5 @@ body {
   }
   .parlay-rail.mode-parlay .rail-scroll { padding-bottom: 0; }
 }
+
 
