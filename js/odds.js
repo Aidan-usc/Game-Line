@@ -6,7 +6,7 @@
   const DEFAULT_DATE_FORMAT = "iso";
 
   // For now this is public in the client. Later: move to a proxy (see note below).
-  const ODDS_API_KEY = window.APP_CONFIG?.ODDS_API_KEY || "REPLACE_WITH_YOUR_KEY";
+  const ODDS_API_KEY = window.APP_CONFIG?.ODDS_API_KEY || "85bd97903b7fe6cc8850b02f70e25ade";
   const ODDS_BASE    = window.APP_CONFIG?.ODDS_API_BASE || "https://api.the-odds-api.com/v4";
 
   const SPORT_KEYS = {
@@ -120,3 +120,4 @@
 
   window.OddsService = { getOddsFor };
 })();
+
