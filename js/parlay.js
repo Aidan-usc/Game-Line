@@ -1,4 +1,4 @@
-// js/parlay.js (non-module, global initParlayPage)
+// js/parlay.js
 (function () {
   // ----- Odds math helpers -----
   function americanToDecimal(american) {
@@ -16,10 +16,19 @@
     return { payout: +(stake * product).toFixed(2), product };
   }
 
+  // Split "City Words Mascot" into {city, mascot} (mascot = last word)
+  function splitCityMascot(full) {
+    const parts = String(full || "").trim().split(/\s+/);
+    if (parts.length === 0) return { city: "", mascot: "" };
+    const mascot = parts.pop();
+    const city = parts.join(" ");
+    return { city, mascot };
+  }
+
   // ----- Parlay state -----
   const state = {
     sport: null,
-    legs: [],           // {id, eventId, label, market, selection, line, odds}
+    legs: [],           // {id, eventId, away:{city,mascot}, home:{city,mascot}, market, selection, line, odds}
     maxLegs: 10,
     wager: 10
   };
@@ -65,42 +74,75 @@
     });
   }
 
+  // Card markup with logos, city/mascot blocks, @ in the middle, and clean markets
   function renderGameCard(g) {
-    // g: {id, time, away, home, mlAway, mlHome, total, over, under}
+    const a = splitCityMascot(g.awayFull);
+    const h = splitCityMascot(g.homeFull);
+    const dt = g.time || ""; // e.g., "Oct 2 • 7:10pm ET"
+    const loc = g.location || (h.city ? `${h.city}` : ""); // fallback: home city
+
     return `
     <article class="game-card" data-game="${g.id}">
       <div class="gc-head">
-        <div class="gc-time">${g.time}</div>
-        <div class="gc-matchup">${g.away} @ ${g.home}</div>
+        <div class="gc-dt">${dt}</div>
+        <div class="gc-loc">${loc}</div>
       </div>
-      <div class="gc-body">
-        ${pickBtn({g, market:"ml", selection:"away", label:`${g.away} ML`, odds:g.mlAway})}
-        ${pickBtn({g, market:"ml", selection:"home", label:`${g.home} ML`, odds:g.mlHome})}
-      </div>
-      <div class="gc-footer">
-        <div>
-          <span class="market-label">Over ${g.total}</span>
-          ${pickBtn({g, market:"tot", selection:"over", label:`Over ${g.total}`, odds:g.over, line:g.total})}
+
+      <div class="gc-center">
+        <div class="team team-away">
+          <img class="team-logo" src="${g.awayLogo || 'assets/img/logos/_placeholder.png'}" alt="${g.awayFull} logo" onerror="this.src='assets/img/logos/_placeholder.png'">
+          <div class="team-city">${a.city}</div>
+          <div class="team-mascot">${a.mascot}</div>
         </div>
-        <div>
-          <span class="market-label">Under ${g.total}</span>
-          ${pickBtn({g, market:"tot", selection:"under", label:`Under ${g.total}`, odds:g.under, line:g.total})}
+
+        <div class="at">@</div>
+
+        <div class="team team-home">
+          <img class="team-logo" src="${g.homeLogo || 'assets/img/logos/_placeholder.png'}" alt="${g.homeFull} logo" onerror="this.src='assets/img/logos/_placeholder.png'">
+          <div class="team-city">${h.city}</div>
+          <div class="team-mascot">${h.mascot}</div>
+        </div>
+      </div>
+
+      <div class="gc-markets">
+        <div class="market ml">
+          <div class="market-label">Moneyline</div>
+          <div class="ml-row">
+            ${pickBtn({g, a, h, market:"ml", selection:"away", label:`${g.awayFull} ML`, odds:g.mlAway})}
+            ${pickBtn({g, a, h, market:"ml", selection:"home", label:`${g.homeFull} ML`, odds:g.mlHome})}
+          </div>
+        </div>
+
+        <div class="market tot">
+          <div class="market-label">Totals</div>
+          <div class="tot-row">
+            <div class="side-label">Under</div>
+            ${pickBtn({g, a, h, market:"tot", selection:"under", label:`Under ${g.total}`, odds:g.under, line:g.total})}
+            <div class="side-label">Over</div>
+            ${pickBtn({g, a, h, market:"tot", selection:"over", label:`Over ${g.total}`, odds:g.over, line:g.total})}
+          </div>
         </div>
       </div>
     </article>`;
   }
 
-  function pickBtn({g, market, selection, label, odds, line=null}) {
+  function pickBtn({g, a, h, market, selection, label, odds, line=null}) {
     const payload = {
       eid: g.id,
-      game: `${g.away} @ ${g.home}`,
+      away: { city: a.city, mascot: a.mascot, full: g.awayFull },
+      home: { city: h.city, mascot: h.mascot, full: g.homeFull },
       market, selection, line,
-      odds,
+      odds: Number(odds),
       label
     };
+    const aria = market === "ml"
+      ? `Moneyline ${selection === 'away' ? g.awayFull : g.homeFull} ${formatAmerican(odds)}`
+      : `Totals ${selection} ${line} ${formatAmerican(odds)}`;
+
     return `<button class="pick-btn"
+              aria-label="${aria}"
               data-payload='${JSON.stringify(payload)}'>
-              ${label} <small>(${formatAmerican(odds)})</small>
+              ${formatAmerican(odds)}
             </button>`;
   }
 
@@ -110,33 +152,46 @@
   }
 
   // ----- Selection state management -----
-  function toggleLeg({eid, market, selection, line, odds, label, game}) {
+  function toggleLeg(p) {
+    const { eid, market, selection } = p;
     const existingIdx = state.legs.findIndex(l => l.eventId === eid && l.market === market);
     if (existingIdx !== -1) {
-      const isSame = state.legs[existingIdx].selection === selection && state.legs[existingIdx].odds === odds;
-      if (isSame) { state.legs.splice(existingIdx, 1); }
-      else { state.legs[existingIdx] = buildLeg({eid, market, selection, line, odds, label, game}); }
+      const isSame = state.legs[existingIdx].selection === selection && state.legs[existingIdx].odds === p.odds;
+      if (isSame) {
+        state.legs.splice(existingIdx, 1);
+      } else {
+        state.legs[existingIdx] = buildLeg(p);
+      }
     } else {
       if (state.legs.length >= state.maxLegs) { alert(`Max ${state.maxLegs} legs reached.`); return; }
-      state.legs.push(buildLeg({eid, market, selection, line, odds, label, game}));
+      state.legs.push(buildLeg(p));
       if (state.legs.length === 1) setRailMode("parlay"); // first leg switches view
     }
   }
 
-  function buildLeg({eid, market, selection, line, odds, label, game}) {
-    return { id:`${eid}_${market}`, eventId:eid, game, market, selection, line, odds:Number(odds), label };
+  function buildLeg(p) {
+    return {
+      id:`${p.eid}_${p.market}`,
+      eventId: p.eid,
+      away: p.away, home: p.home,
+      market: p.market, selection: p.selection, line: p.line,
+      odds: Number(p.odds),
+    };
   }
 
-  function markSelections({eid, market}) {
+  function markSelections({eid, market, selection}) {
     const card = document.querySelector(`.game-card[data-game="${eid}"]`);
     if (!card) return;
+    // Clear current
     card.querySelectorAll(".pick-btn").forEach(b => b.classList.remove("selected"));
-    const leg = state.legs.find(l => l.eventId === eid && l.market === market);
-    if (!leg) return;
-    card.querySelectorAll(".pick-btn").forEach(b => {
-      const p = JSON.parse(b.dataset.payload);
-      if (p.market === market && p.selection === leg.selection) b.classList.add("selected");
+    // Re-select
+    const match = Array.from(card.querySelectorAll(".pick-btn")).find(b => {
+      try {
+        const p = JSON.parse(b.dataset.payload);
+        return p.market === market && p.selection === selection;
+      } catch { return false; }
     });
+    if (match) match.classList.add("selected");
   }
 
   // ----- Right rail -----
@@ -153,7 +208,7 @@
     clearBtn && clearBtn.addEventListener("click", () => {
       state.legs = [];
       document.querySelectorAll(".pick-btn.selected").forEach(b => b.classList.remove("selected"));
-      setRailMode("bets");     // revert to bets view
+      setRailMode("bets");
       updateRail();
     });
     const submitBtn = document.getElementById("submit-parlay");
@@ -175,8 +230,10 @@
         const leg = state.legs.find(l => l.id === id);
         const card = document.querySelector(`.game-card[data-game="${leg.eventId}"]`);
         if (card) card.querySelectorAll(".pick-btn").forEach(b => {
-          const p = JSON.parse(b.dataset.payload);
-          if (p.market === leg.market) b.classList.remove("selected");
+          try {
+            const p = JSON.parse(b.dataset.payload);
+            if (p.market === leg.market) b.classList.remove("selected");
+          } catch {}
         });
         state.legs = state.legs.filter(l => l.id !== id);
         updateRail();
@@ -195,46 +252,62 @@
     const submitBtn = document.getElementById("submit-parlay");
     submitBtn && (submitBtn.disabled = state.legs.length === 0);
 
-    // mode check
     if (state.legs.length === 0) setRailMode("bets");
   }
 
+  // Right-rail leg: 5-line left block with @ in middle
   function renderLeg(l) {
-    const m = l.market === "ml" ? "Moneyline" : (l.selection[0].toUpperCase() + l.selection.slice(1));
-    const sub = l.market === "tot" ? `${m} ${l.line}` : m;
+    const a = l.away || {city:"", mascot:""};
+    const h = l.home || {city:"", mascot:""};
+    const marketLabel = l.market === "ml" ? "Moneyline" : (l.selection[0].toUpperCase() + l.selection.slice(1) + (l.line ? ` ${l.line}` : ""));
     return `<li class="leg">
-      <div>
-        <div class="title">${l.label}</div>
-        <div class="meta">${l.game} • ${sub}</div>
+      <div class="names">
+        <div class="name-city">${a.city}</div>
+        <div class="name-mascot">${a.mascot}</div>
+        <div class="name-at">@</div>
+        <div class="name-city">${h.city}</div>
+        <div class="name-mascot">${h.mascot}</div>
       </div>
-      <div style="display:flex;align-items:center;gap:10px;">
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
         <span class="odds">${formatAmerican(l.odds)}</span>
+        <span class="meta" style="font-size:12px;opacity:.75;">${marketLabel}</span>
         <span class="remove" title="Remove" data-id="${l.id}">✕</span>
       </div>
     </li>`;
   }
 
-  // ----- Mock data (replace with odds.js later) -----
+  // ----- Mock data (replace with Odds API later) -----
   function getMockData(sport) {
-    const base = [
-      { id:"g1", time:"Sep 24 • 8:10pm", away:"Milwaukee", home:"San Diego", mlAway:+107, mlHome:-131, total:7.5, over:-117, under:-104 },
-      { id:"g2", time:"Sep 24 • 10:36pm", away:"Tampa Bay", home:"Baltimore", mlAway:+100, mlHome:-122, total:8.0, over:-114, under:-107 },
-      { id:"g3", time:"Sep 24 • 10:41pm", away:"Pittsburgh", home:"Cincinnati", mlAway:-102, mlHome:-119, total:6.5, over:-124, under:+102 },
-    ];
+    // You can swap logos with your own assets; these paths are examples.
+    const logo = t => `assets/img/logos/${t}.png`;
     if (sport === "nfl") {
       return [
-        { id:"g4", time:"Sep 26 • 12:16am", away:"Seattle", home:"Arizona", mlAway:-122, mlHome:+102, total:43.5, over:-105, under:-115 },
-        { id:"g5", time:"Sep 28 • 5:00pm", away:"Cleveland", home:"Detroit", mlAway:+390, mlHome:-520, total:44.5, over:-105, under:-115 },
-        { id:"g6", time:"Sep 28 • 5:01pm", away:"Washington", home:"Atlanta", mlAway:+140, mlHome:-160, total:42.5, over:-108, under:-112 },
+        { id:"g4", time:"Oct 3 • 1:00pm ET", location:"Glendale, AZ", awayFull:"Seattle Seahawks", homeFull:"Arizona Cardinals",
+          awayLogo:logo("SEA"), homeLogo:logo("ARI"), mlAway:-122, mlHome:+102, total:43.5, over:-105, under:-115 },
+        { id:"g5", time:"Oct 3 • 4:25pm ET", location:"Detroit, MI", awayFull:"Cleveland Browns", homeFull:"Detroit Lions",
+          awayLogo:logo("CLE"), homeLogo:logo("DET"), mlAway:+390, mlHome:-520, total:44.5, over:-105, under:-115 },
+        { id:"g6", time:"Oct 3 • 8:20pm ET", location:"Atlanta, GA", awayFull:"Washington Commanders", homeFull:"Atlanta Falcons",
+          awayLogo:logo("WAS"), homeLogo:logo("ATL"), mlAway:+140, mlHome:-160, total:42.5, over:-108, under:-112 },
       ];
     }
     if (sport === "sec") {
       return [
-        { id:"g7", time:"Sep 25 • 11:30pm", away:"Army", home:"ECU", mlAway:+180, mlHome:-218, total:53.5, over:-108, under:-112 },
-        { id:"g8", time:"Sep 26 • 11:00pm", away:"FSU", home:"Virginia", mlAway:-258, mlHome:+210, total:59.5, over:-105, under:-115 },
-        { id:"g9", time:"Sep 27 • 1:00am", away:"TCU", home:"ASU", mlAway:+110, mlHome:-130, total:55.5, over:-112, under:-108 },
+        { id:"g7", time:"Oct 4 • 7:30pm ET", location:"Greenville, NC", awayFull:"Army Black Knights", homeFull:"East Carolina Pirates",
+          awayLogo:logo("ARMY"), homeLogo:logo("ECU"), mlAway:+180, mlHome:-218, total:53.5, over:-108, under:-112 },
+        { id:"g8", time:"Oct 5 • 7:00pm ET", location:"Charlottesville, VA", awayFull:"Florida State Seminoles", homeFull:"Virginia Cavaliers",
+          awayLogo:logo("FSU"), homeLogo:logo("UVA"), mlAway:-258, mlHome:+210, total:59.5, over:-105, under:-115 },
+        { id:"g9", time:"Oct 5 • 9:00pm ET", location:"Tempe, AZ", awayFull:"TCU Horned Frogs", homeFull:"Arizona State Sun Devils",
+          awayLogo:logo("TCU"), homeLogo:logo("ASU"), mlAway:+110, mlHome:-130, total:55.5, over:-112, under:-108 },
       ];
     }
-    return base;
+    // default MLB
+    return [
+      { id:"g1", time:"Oct 2 • 7:10pm ET", location:"San Diego, CA", awayFull:"Milwaukee Brewers", homeFull:"San Diego Padres",
+        awayLogo:logo("MIL"), homeLogo:logo("SD"), mlAway:+107, mlHome:-131, total:7.5, over:-117, under:-104 },
+      { id:"g2", time:"Oct 2 • 9:05pm ET", location:"Baltimore, MD", awayFull:"Tampa Bay Rays", homeFull:"Baltimore Orioles",
+        awayLogo:logo("TB"), homeLogo:logo("BAL"), mlAway:+100, mlHome:-122, total:8.0, over:-114, under:-107 },
+      { id:"g3", time:"Oct 2 • 9:10pm ET", location:"Cincinnati, OH", awayFull:"Pittsburgh Pirates", homeFull:"Cincinnati Reds",
+        awayLogo:logo("PIT"), homeLogo:logo("CIN"), mlAway:-102, mlHome:-119, total:6.5, over:-124, under:+102 },
+    ];
   }
 })();
