@@ -26,6 +26,9 @@
       </div>
     </section>
 
+    <!-- Filters (dropdown + search + refresh) -->
+    <section id="filters" class="filter-bar"></section>
+
     <!-- Odds board + right rail mount -->
     <div class="odds-layout">
       <section id="odds-board" class="odds-board" aria-live="polite"></section>
@@ -38,8 +41,11 @@
   <!-- JS: order matters -->
   <script src="js/app.js?v=2"></script>
 
-  <!-- (Optional) keep your API key out of odds.js -->
-  <!-- <script src="js/config.js"></script> -->
+  <!-- If you're keeping the API key out of odds.js, include config.js here -->
+  <!-- <script src="js/config.js?v=1"></script> -->
+
+  <!-- These two should be present if you added division/conference maps -->
+  <!-- <script src="js/meta.js?v=1"></script> -->
 
   <script src="js/logos.js?v=1"></script>
   <script src="js/odds.js?v=1"></script>
