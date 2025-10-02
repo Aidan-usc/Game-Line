@@ -94,43 +94,58 @@
   }
 
   // Filters UI
-  function buildFiltersUI(sportKey) {
-    const wrap = document.getElementById("filters");
-    if (!wrap) return;
-    wrap.innerHTML = `
-      <div class="filter-left">
-        <select id="filter-league" class="filter-select"></select>
-      </div>
-      <div class="filter-right">
-        <input id="filter-search" class="filter-search" type="search" placeholder="Search teams..." />
-        <button id="filter-refresh" class="filter-refresh" type="button">Refresh odds</button>
-      </div>
-    `;
+// Filters UI
+function buildFiltersUI(sportKey) {
+  const wrap = document.getElementById("filters");
+  if (!wrap) return;
 
-    // options by sport
-    const sel = document.getElementById("filter-league");
-    const opts =
-      sportKey === "mlb" ? [
-        "All",
-        "AL East","AL Central","AL West",
-        "NL East","NL Central","NL West"
-      ] :
-      sportKey === "nfl" ? [
-        "All",
-        "AFC East","AFC North","AFC South","AFC West",
-        "NFC East","NFC North","NFC South","NFC West"
-      ] :
-      // CFB (Power 4 + ND)
-      [
-        "All (Power 4 + ND)",
-        "SEC","Big Ten","Big 12","ACC","Notre Dame"
-      ];
-    for (const o of opts) {
-      const el = document.createElement("option");
-      el.value = o; el.textContent = o;
-      sel.appendChild(el);
-    }
+  // Label text changes for CFB
+  const labelText = sportKey === "sec" ? "Conference" : "Division";
+
+  wrap.innerHTML = `
+    <div class="filter-bar-inner">
+      <div class="filter-left">
+        <label class="filter-label" for="filter-league">${labelText}</label>
+        <div class="select-wrap">
+          <select id="filter-league" class="filter-select" aria-label="${labelText} filter"></select>
+        </div>
+      </div>
+
+      <div class="filter-right">
+        <div class="search-wrap">
+          <input id="filter-search" class="filter-search" type="search" placeholder="Search teams…" aria-label="Search teams">
+        </div>
+        <button id="filter-refresh" class="btn btn-refresh" type="button" title="Refresh odds">↻</button>
+      </div>
+    </div>
+  `;
+
+  // options by sport
+  const sel = document.getElementById("filter-league");
+  const opts =
+    sportKey === "mlb" ? [
+      "All",
+      "AL East","AL Central","AL West",
+      "NL East","NL Central","NL West"
+    ] :
+    sportKey === "nfl" ? [
+      "All",
+      "AFC East","AFC North","AFC South","AFC West",
+      "NFC East","NFC North","NFC South","NFC West"
+    ] :
+    // CFB (Power 4 + ND)
+    [
+      "All (Power 4 + ND)",
+      "SEC","Big Ten","Big 12","ACC","Notre Dame"
+    ];
+
+  for (const o of opts) {
+    const el = document.createElement("option");
+    el.value = o; el.textContent = o;
+    sel.appendChild(el);
   }
+}
+
 
   // Filtering logic
   function matchDivisionConf(sportKey, filterValue, game) {
@@ -226,4 +241,5 @@
   // Expose
   window.OddsService = { getOddsFor };
 })();
+
 
