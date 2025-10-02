@@ -16,6 +16,21 @@
     return { payout: +(stake * product).toFixed(2), product };
   }
 
+function renderBoard(data){
+  const board = document.getElementById("odds-board");
+  if (!board) return;
+  board.innerHTML = data.map(renderGameCard).join("");
+  board.querySelectorAll(".pick-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const payload = JSON.parse(btn.dataset.payload);
+      toggleLeg(payload);
+      markSelections(payload);
+      updateRail();
+    });
+  });
+}
+
+  
   // Split "City Words Mascot" into {city, mascot} (mascot = last word)
   function splitCityMascot(full) {
     const parts = String(full || "").trim().split(/\s+/);
@@ -63,20 +78,7 @@ renderLiveOdds(sport).catch(err => {
 async function renderLiveOdds(sport) {
   if (!window.OddsService) throw new Error("OddsService missing");
   const data = await window.OddsService.getOddsFor(sport);
-  const board = document.getElementById("odds-board");
-  if (!board) return;
-
-  board.innerHTML = data.map(renderGameCard).join("");
-
-  // attach click handlers
-  board.querySelectorAll(".pick-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const payload = JSON.parse(btn.dataset.payload);
-      toggleLeg(payload);
-      markSelections(payload);
-      updateRail();
-    });
-  });
+  renderBoard(data);
 }
 
   
@@ -351,6 +353,9 @@ async function renderLiveOdds(sport) {
 
 
 
+window.reRenderOdds = function(list){
+  renderBoard(list);
+};
 
 
 
