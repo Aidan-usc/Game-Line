@@ -1,4 +1,4 @@
-// js/parlay.js
+// js/parlay.js (non-module, global initParlayPage)
 (function () {
   // ----- Odds math helpers -----
   function americanToDecimal(american) {
@@ -24,10 +24,25 @@
     wager: 10
   };
 
+  // ----- Rail mode handling -----
+  let railEl, titleEl;
+  function setRailMode(mode) {
+    if (!railEl) return;
+    const isParlay = mode === "parlay";
+    railEl.classList.toggle("mode-parlay", isParlay);
+    railEl.classList.toggle("mode-bets", !isParlay);
+    if (titleEl) titleEl.textContent = isParlay ? "Build a Parlay" : "Bets in Play";
+  }
+
   // Expose global init
   window.initParlayPage = function initParlayPage(sport) {
     state.sport = sport;
-    renderMockOdds(sport); // replace with live odds later
+
+    railEl = document.getElementById("parlay-rail");
+    titleEl = document.getElementById("rail-title");
+    setRailMode("bets"); // default view
+
+    renderMockOdds(sport); // TODO: swap with live odds
     hookRail();
     updateRail();
   };
@@ -99,12 +114,13 @@
     const existingIdx = state.legs.findIndex(l => l.eventId === eid && l.market === market);
     if (existingIdx !== -1) {
       const isSame = state.legs[existingIdx].selection === selection && state.legs[existingIdx].odds === odds;
-      if (isSame) { state.legs.splice(existingIdx, 1); return; }
-      state.legs[existingIdx] = buildLeg({eid, market, selection, line, odds, label, game});
-      return;
+      if (isSame) { state.legs.splice(existingIdx, 1); }
+      else { state.legs[existingIdx] = buildLeg({eid, market, selection, line, odds, label, game}); }
+    } else {
+      if (state.legs.length >= state.maxLegs) { alert(`Max ${state.maxLegs} legs reached.`); return; }
+      state.legs.push(buildLeg({eid, market, selection, line, odds, label, game}));
+      if (state.legs.length === 1) setRailMode("parlay"); // first leg switches view
     }
-    if (state.legs.length >= state.maxLegs) { alert(`Max ${state.maxLegs} legs reached.`); return; }
-    state.legs.push(buildLeg({eid, market, selection, line, odds, label, game}));
   }
 
   function buildLeg({eid, market, selection, line, odds, label, game}) {
@@ -137,6 +153,7 @@
     clearBtn && clearBtn.addEventListener("click", () => {
       state.legs = [];
       document.querySelectorAll(".pick-btn.selected").forEach(b => b.classList.remove("selected"));
+      setRailMode("bets");     // revert to bets view
       updateRail();
     });
     const submitBtn = document.getElementById("submit-parlay");
@@ -177,6 +194,9 @@
 
     const submitBtn = document.getElementById("submit-parlay");
     submitBtn && (submitBtn.disabled = state.legs.length === 0);
+
+    // mode check
+    if (state.legs.length === 0) setRailMode("bets");
   }
 
   function renderLeg(l) {
