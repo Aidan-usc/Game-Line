@@ -10,7 +10,7 @@
   background:#fff;
   border:2px solid var(--indigo);                 /* indigo outline */
   border-radius:var(--radius);
-  box-shadow:0 10px 24px rgba(20,1,22,.12);       /* stronger base shadow */
+  box-shadow:0 10px 24px rgba(20,1,22,.32);       /* stronger base shadow */
   overflow:hidden;
   display:grid;
   grid-template-rows:auto auto 1fr;
@@ -19,7 +19,7 @@
 }
 .game-card:hover{
   transform:translateY(-3px) scale(1.008);        /* subtle lift + grow */
-  box-shadow:0 18px 36px rgba(20,1,22,.22);       /* darker on hover */
+  box-shadow:0 18px 36px rgba(20,1,22,.52);       /* darker on hover */
 }
 
 /* --- Tighter overall footprint --- */
