@@ -417,13 +417,25 @@ body {
   flex-direction: column;
   overflow: hidden;     /* the rail itself never scrolls */
 }
+/* Center + enlarge the right-rail title */
+.rail-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 6px;
+  margin-bottom: 8px;
+  border-bottom: 1px dashed #eae6ff; /* subtle divider */
+}
 
-.rail-header { flex: 0 0 auto; }
 .rail-title {
   font-family: var(--font-nav);
-  font-size: 22px;
-  margin: 2px 0 8px;
+  /* grows a bit on wider screens, but caps to avoid wrapping */
+  font-size: clamp(24px, 2.4vw, 30px);
+  line-height: 1.1;
+  text-align: center;
+  letter-spacing: .06em;
   color: var(--indigo);
+  margin: 0; /* remove default vertical offset */
 }
 
 /* Scrollable middle area; footer overlays it */
@@ -525,5 +537,6 @@ body {
   }
   .parlay-rail.mode-parlay .rail-scroll { padding-bottom: 0; }
 }
+
 
 
