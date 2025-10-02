@@ -1,13 +1,13 @@
 // js/app.js
-async function loadPartial(id, file) {
-  const el = document.getElementById(id);
-  if (!el) return null;
+async function loadPartial(id, file, v = 1) {
+  const mount = document.getElementById(id);
+  if (!mount) return null;
   try {
-    // bump the query param to bust cache when you update the partial
-    const res = await fetch(`${file}?v=1`);
+    const res = await fetch(`${file}?v=${v}`);
+    if (!res.ok) throw new Error(`${file} ${res.status}`);
     const html = await res.text();
-    el.innerHTML = html;
-    return el;
+    mount.innerHTML = html;
+    return mount.firstElementChild || mount;
   } catch (err) {
     console.error(`Error loading ${file}`, err);
     return null;
@@ -15,15 +15,32 @@ async function loadPartial(id, file) {
 }
 
 async function loadAllPartials() {
-  // header & footer exist on all pages
-  const headerP = loadPartial("header", "assets/partials/header.html");
-  const footerP = loadPartial("footer", "assets/partials/footer.html");
+  const headerP = loadPartial("header", "assets/partials/header.html", 1);
+  const footerP = loadPartial("footer", "assets/partials/footer.html", 1);
 
-  // rail only on league pages (where a #rail placeholder exists)
-  let railLoaded = null;
+  let railP = null;
   if (document.getElementById("rail")) {
-    railLoaded = loadPartial("rail", "assets/partials/rail.html");
+    railP = loadPartial("rail", "assets/partials/rail.html", 1);
   }
+
+  const [headerEl, footerEl, railEl] = await Promise.all([headerP, footerP, railP]);
+
+  // wallet stub
+  const balanceEl = document.getElementById("wallet-balance");
+  if (balanceEl) balanceEl.textContent = `$${(50).toFixed(2)}`;
+
+  // let pages hook into the rail after it exists
+  if (railEl) window.dispatchEvent(new CustomEvent("rail:ready"));
+}
+
+// fixed-header shadow (optional)
+window.addEventListener("scroll", () => {
+  const hdr = document.querySelector(".site-header");
+  if (!hdr) return;
+  hdr.classList.toggle("scrolled", window.scrollY > 2);
+});
+
+window.addEventListener("DOMContentLoaded", loadAllPartials);
 
   const [headerEl, footerEl, railEl] = await Promise.all([headerP, footerP, railLoaded]);
 
@@ -54,5 +71,6 @@ window.addEventListener("scroll", () => {
   if (!hdr) return;
   hdr.classList.toggle("scrolled", window.scrollY > 2);
 });
+
 
 
