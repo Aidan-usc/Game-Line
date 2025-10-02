@@ -139,6 +139,7 @@ async function renderLiveOdds(sport) {
 
 <div class="market tot">
   <div class="market-label">Totals</div>
+  <div class="total-number">Total: ${g.total ?? "—"}</div>
   <div class="tot-row">
     <div class="tot-col">
       <div class="side-label">Under</div>
@@ -150,6 +151,7 @@ async function renderLiveOdds(sport) {
     </div>
   </div>
 </div>
+
 
 </div>
 
@@ -341,6 +343,7 @@ async function renderLiveOdds(sport) {
     ];
   }
 })();
+
 
 
 
