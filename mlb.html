@@ -4,15 +4,21 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>MLB Odds – Phantom Picks</title>
+
+  <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Nabla&family=Audiowide&family=Merriweather&display=swap" rel="stylesheet">
+
+  <!-- CSS -->
   <link rel="stylesheet" href="assets/css/styles.css?v=odds3">
   <link rel="stylesheet" href="assets/css/cards.css?v=1">
 </head>
 <body>
+  <!-- header/footer are injected -->
   <div id="header"></div>
 
+  <!-- IMPORTANT: data-sport drives which odds we fetch -->
   <main class="page-content page--odds" data-sport="mlb">
-    <!-- League Banner -->
+    <!-- Banner -->
     <section class="league-banner league-mlb">
       <div class="banner-inner">
         <h1>MLB</h1>
@@ -20,28 +26,29 @@
       </div>
     </section>
 
-    <!-- Layout: odds board + right rail -->
+    <!-- Odds board + right rail mount -->
     <div class="odds-layout">
       <section id="odds-board" class="odds-board" aria-live="polite"></section>
-
-      <!-- Right rail partial mounts here -->
       <div id="rail"></div>
     </div>
   </main>
 
   <div id="footer"></div>
 
-  <!-- Order matters: app.js loads the partials, then parlay.js wires behavior -->
+  <!-- JS: order matters -->
   <script src="js/app.js?v=2"></script>
-  <script src="js/logos.js?v=1"></script>
-<script src="js/odds.js?v=1"></script>
-<script src="js/parlay.js?v=6"></script>
 
+  <!-- (Optional) keep your API key out of odds.js -->
+  <!-- <script src="js/config.js"></script> -->
+
+  <script src="js/logos.js?v=1"></script>
+  <script src="js/odds.js?v=1"></script>
+  <script src="js/parlay.js?v=6"></script>
   <script>
-    /* Wait until the rail partial is injected, THEN init the page.
-       app.js dispatches 'rail:ready' after it inserts assets/partials/rail.html */
-    window.addEventListener('rail:ready', function () {
-      window.initParlayPage && window.initParlayPage('mlb');
+    // Init after rail partial is injected
+    window.addEventListener('rail:ready', () => {
+      const sport = document.querySelector('.page--odds')?.dataset?.sport || 'mlb';
+      window.initParlayPage && window.initParlayPage(sport);
     });
   </script>
 </body>
