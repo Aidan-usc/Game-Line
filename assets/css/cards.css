@@ -75,7 +75,7 @@
 .side-label{
   text-align:center;
   font-weight:700;               /* keep bold, but smaller size */
-  font-size: clamp(12px, 1.3vw, 15px);
+  font-size: clamp(10px, 1.3vw, 15px);
   line-height: 1.1;
   opacity: .9;                   /* optional: a hair softer */
 }
