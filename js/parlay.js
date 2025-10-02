@@ -130,12 +130,19 @@ async function renderLiveOdds(sport) {
 
       <div class="gc-markets">
         <div class="market ml">
-          <div class="market-label">Moneyline</div>
-          <div class="ml-row">
-            ${pickBtn({g, a, h, market:"ml", selection:"away", label:`${g.awayFull} ML`, odds:g.mlAway})}
-            ${pickBtn({g, a, h, market:"ml", selection:"home", label:`${g.homeFull} ML`, odds:g.mlHome})}
-          </div>
-        </div>
+  <div class="market-label">Moneyline</div>
+  <div class="ml-row">
+    <div class="ml-col">
+      <div class="side-label">Away</div>
+      ${pickBtn({ g, a, h, market:"ml", selection:"away", label:`${g.awayFull} ML`, odds:g.mlAway })}
+    </div>
+    <div class="ml-col">
+      <div class="side-label">Home</div>
+      ${pickBtn({ g, a, h, market:"ml", selection:"home", label:`${g.homeFull} ML`, odds:g.mlHome })}
+    </div>
+  </div>
+</div>
+
 
 <div class="market tot">
   <div class="market-label">Totals</div>
@@ -342,6 +349,7 @@ async function renderLiveOdds(sport) {
     ];
   }
 })();
+
 
 
 
