@@ -556,47 +556,17 @@ body {
   font-family:var(--font-nav); font-size:14px; text-decoration:underline; padding:6px 8px; }
 .filter-refresh:hover{ color:var(--deep); }
 
-
-
-
-
-/* --- Filter bar --- */
-.filter-bar{
-  display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between;
-  gap:10px; margin: 8px auto 18px; max-width:1200px; padding:8px 12px;
-  background:#fff; border:2px solid var(--indigo); border-radius:var(--radius); box-shadow:var(--shadow);
-}
-
-.filter-left, .filter-right{ display:flex; align-items:center; gap:10px; }
-
-.filter-select, .filter-search{
-  font-family: var(--font-body);
-  font-size:14px; line-height:1;
-  border:1px solid #e1dbff; border-radius:10px; padding:8px 10px; background:#fbfaff;
-}
-.filter-search{ min-width: 220px; }
-
-.filter-refresh{
-  background:transparent; border:none; color:var(--indigo); cursor:pointer;
-  font-family:var(--font-nav); font-size:14px; text-decoration:underline; padding:6px 8px;
-}
-.filter-refresh:hover{ color:var(--deep); }
-
-
 /* =========================
-   FILTER BAR (division/conference + search)
+   FILTER BAR (under banner)
    ========================= */
 .filter-bar {
-  position: sticky;
-  top: 100px; /* header height */
-  z-index: 4;
-  margin: 8px 0 16px;
+  position: static;                 /* was sticky earlier; now it scrolls away */
+  margin: 8px 0 16px;               /* space below the banner */
 }
 
 .filter-bar-inner {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 12px;
   background: #fff;
   border: 2px solid rgba(59, 30, 118, 0.14); /* indigo tint */
@@ -605,13 +575,22 @@ body {
   padding: 10px 12px;
 }
 
-.filter-left, .filter-right {
+/* Left group: "Division"/"Conference" label + select */
+.filter-left {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-/* Label "Division" / "Conference" */
+/* Right group: search + refresh button pushed to the right */
+.filter-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: auto;                /* pushes this group to the right */
+}
+
+/* Label chip */
 .filter-label {
   font-family: var(--font-nav);
   font-size: 14px;
@@ -624,85 +603,66 @@ body {
   user-select: none;
 }
 
-/* Nice-looking select with custom arrow */
-.select-wrap {
-  position: relative;
-  display: inline-block;
-}
+/* Custom select with chevron */
+.select-wrap { position: relative; display: inline-block; }
 .select-wrap::after {
   content: "";
   position: absolute;
-  right: 10px;
-  top: 50%;
-  width: 10px;
-  height: 10px;
+  right: 10px; top: 50%;
+  width: 10px; height: 10px;
   transform: translateY(-50%) rotate(45deg);
   border-right: 2px solid var(--indigo);
   border-bottom: 2px solid var(--indigo);
-  pointer-events: none;
-  opacity: .85;
+  pointer-events: none; opacity: .85;
 }
 .filter-select {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
+  appearance: none; -webkit-appearance: none; -moz-appearance: none;
   font-family: var(--font-body);
   font-size: 14px;
-  padding: 10px 34px 10px 12px; /* room for the arrow */
+  padding: 10px 34px 10px 12px;
   border: 2px solid rgba(59,30,118,.22);
   border-radius: 12px;
   background: #fff;
   color: var(--deep);
   line-height: 1;
 }
-.filter-select:hover {
-  border-color: var(--indigo);
-}
+.filter-select:hover { border-color: var(--indigo); }
 .filter-select:focus {
   outline: 3px solid rgba(255,229,89,.5); /* maize glow */
   outline-offset: 1px;
 }
 
-/* Search with magnifier icon */
-.search-wrap {
-  position: relative;
-}
+/* Search with magnifier */
+.search-wrap { position: relative; }
 .search-wrap::before {
   content: "";
   position: absolute;
-  left: 10px;
-  top: 50%;
-  width: 14px;
-  height: 14px;
+  left: 10px; top: 50%;
+  width: 14px; height: 14px;
   transform: translateY(-50%);
-  /* simple magnifier with borders */
   border: 2px solid rgba(20,1,22,.5);
   border-radius: 50%;
-  box-shadow: 8px 8px 0 -6px rgba(20,1,22,.5); /* handle */
+  box-shadow: 8px 8px 0 -6px rgba(20,1,22,.5);
   opacity: .8;
 }
 .filter-search {
   font-family: var(--font-body);
   font-size: 14px;
-  padding: 10px 12px 10px 32px; /* room for magnifier */
+  padding: 10px 12px 10px 32px; /* room for icon */
   border: 2px solid rgba(59,30,118,.22);
   border-radius: 12px;
   background: #fff;
   color: var(--deep);
-  min-width: 220px;
+  min-width: 240px;
 }
-.filter-search::placeholder {
-  color: rgba(20,1,22,.5);
-}
-.filter-search:hover {
-  border-color: var(--indigo);
-}
+.filter-search::placeholder { color: rgba(20,1,22,.5); }
+.filter-search:hover { border-color: var(--indigo); }
 .filter-search:focus {
   outline: 3px solid rgba(255,229,89,.5);
   outline-offset: 1px;
 }
 
-/* Refresh button (tiny) */
+/* Tiny refresh button */
 .btn.btn-refresh {
   font-family: var(--font-nav);
   font-size: 14px;
@@ -715,13 +675,8 @@ body {
   cursor: pointer;
   transition: transform .06s ease, box-shadow .2s ease, background .2s ease;
 }
-.btn.btn-refresh:hover {
-  background: var(--deep);
-  box-shadow: 0 6px 18px rgba(0,0,0,.14);
-}
-.btn.btn-refresh:active {
-  transform: translateY(1px);
-}
+.btn.btn-refresh:hover { background: var(--deep); box-shadow: 0 6px 18px rgba(0,0,0,.14); }
+.btn.btn-refresh:active { transform: translateY(1px); }
 
 /* Responsive */
 @media (max-width: 820px) {
@@ -730,8 +685,6 @@ body {
     align-items: stretch;
     gap: 10px;
   }
-  .filter-right {
-    justify-content: space-between;
-  }
+  .filter-right { margin-left: 0; }
   .filter-search { min-width: 0; width: 100%; }
 }
