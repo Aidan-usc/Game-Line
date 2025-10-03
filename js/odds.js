@@ -148,6 +148,10 @@ function buildFiltersUI(sportKey) {
 
 const _norm = s => String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
 
+// Reuse the same normalizer used in meta.js
+const _norm = (window.__NAME_NORM__) || (s => String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim());
+
+// Filtering logic (robust; graceful fallback)
 function matchDivisionConf(sportKey, filterValue, game) {
   const val = _norm(filterValue || "");
   if (!val || val.startsWith("all")) return true;
@@ -162,11 +166,11 @@ function matchDivisionConf(sportKey, filterValue, game) {
   const teamMatches = (fullName) => {
     if (sportKey === "mlb" && mlbMap) {
       const div = _norm(mlbMap[fullName] || "");
-      return !!div && div === val;
+      return div && div === val;
     }
     if (sportKey === "nfl" && nflMap) {
       const div = _norm(nflMap[fullName] || "");
-      return !!div && div === val;
+      return div && div === val;
     }
     if (sportKey === "sec" && cfbMap) {
       const conf = _norm(cfbMap[fullName] || "");
@@ -174,12 +178,15 @@ function matchDivisionConf(sportKey, filterValue, game) {
       if (val === "notre dame") return conf === "notre dame";
       return conf === val;
     }
-    // If maps aren’t available for this sport, don’t filter out the game
+    // If mapping missing for this sport, don't block the game
     return true;
   };
 
-  return teamMatches(away) || teamMatches(home);
+  // Keep the game if either team matches the selected bucket
+  const hit = teamMatches(away) || teamMatches(home);
+  return !!hit;
 }
+
   // Public API
   async function getOddsFor(sportKey) {
     const sportApi = SPORT_TO_API[sportKey];
@@ -248,6 +255,7 @@ function matchDivisionConf(sportKey, filterValue, game) {
   // Expose
   window.OddsService = { getOddsFor };
 })();
+
 
 
 
