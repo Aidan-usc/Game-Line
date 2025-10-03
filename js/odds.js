@@ -27,6 +27,14 @@
   // ---- Helpers ----
   const norm = (window.__NAME_NORM__) || (s => String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim());
 
+// after: const norm = (window.__NAME_NORM__) || (...)
+function canonTeamName(sportKey, name) {
+  const n = norm(name);
+  const al = (window.TEAM_ALIASES && window.TEAM_ALIASES[sportKey]) || {};
+  return al[n] || n;
+}
+
+  
   const addDays = (d, n) => {
     const t = new Date(d);
     t.setDate(t.getDate() + n);
@@ -164,38 +172,38 @@
   }
 
   // Robust division/conf matching using normalized maps from meta.js
-  function matchDivisionConf(sportKey, filterValue, game) {
-    const val = norm(filterValue || "");
-    if (!val || val.startsWith("all")) return true;
+function matchDivisionConf(sportKey, filterValue, game) {
+  const val = norm(filterValue || "");
+  if (!val || val.startsWith("all")) return true;
 
-    const nflMap = window.NFL_TEAM_TO_DIVISION;
-    const mlbMap = window.MLB_TEAM_TO_DIVISION;
-    const cfbMap = window.CFB_TEAM_TO_CONF;
+  const nflMap = window.NFL_TEAM_TO_DIVISION;
+  const mlbMap = window.MLB_TEAM_TO_DIVISION;
+  const cfbMap = window.CFB_TEAM_TO_CONF;
 
-    const away = norm(game.awayFull);
-    const home = norm(game.homeFull);
+  const away = canonTeamName(sportKey, game.awayFull);
+  const home = canonTeamName(sportKey, game.homeFull);
 
-    const teamMatches = (fullName) => {
-      if (sportKey === "mlb" && mlbMap) {
-        const div = norm(mlbMap[fullName] || "");
-        return !!div && div === val;
-      }
-      if (sportKey === "nfl" && nflMap) {
-        const div = norm(nflMap[fullName] || "");
-        return !!div && div === val;
-      }
-      if (sportKey === "sec" && cfbMap) {
-        const conf = norm(cfbMap[fullName] || "");
-        if (!conf) return false;
-        if (val === "notre dame") return conf === "notre dame";
-        return conf === val;
-      }
-      // If mapping not available, don't exclude
-      return true;
-    };
+  const teamMatches = (fullName) => {
+    if (sportKey === "mlb" && mlbMap) {
+      const div = norm(mlbMap[fullName] || "");
+      return !!div && div === val;
+    }
+    if (sportKey === "nfl" && nflMap) {
+      const div = norm(nflMap[fullName] || "");
+      return !!div && div === val;
+    }
+    if (sportKey === "sec" && cfbMap) {
+      const conf = norm(cfbMap[fullName] || "");
+      if (!conf) return false;
+      if (val === "notre dame") return conf === "notre dame";
+      return conf === val;
+    }
+    return true; // fail-open if map missing
+  };
 
-    return teamMatches(away) || teamMatches(home);
-  }
+  return teamMatches(away) || teamMatches(home);
+}
+
 
   // ---- Public API ----
   async function getOddsFor(sportKey) {
@@ -284,3 +292,4 @@
   // Expose
   window.OddsService = { getOddsFor };
 })();
+
