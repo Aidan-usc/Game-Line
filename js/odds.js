@@ -146,33 +146,40 @@ function buildFiltersUI(sportKey) {
   }
 }
 
+const _norm = s => String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
 
-  // Filtering logic
-  function matchDivisionConf(sportKey, filterValue, game) {
-    const val = (filterValue || "").toLowerCase();
-    if (!val || val.startsWith("all")) return true;
+function matchDivisionConf(sportKey, filterValue, game) {
+  const val = _norm(filterValue || "");
+  if (!val || val.startsWith("all")) return true;
 
-    // helper: does a single team match the filter?
-    const teamMatches = (fullName) => {
-      if (sportKey === "mlb") {
-        return window.MLB_TEAM_TO_DIVISION?.[fullName]?.toLowerCase() === val;
-      }
-      if (sportKey === "nfl") {
-        return window.NFL_TEAM_TO_DIVISION?.[fullName]?.toLowerCase() === val;
-      }
-      if (sportKey === "sec") {
-        // CFB: conferences + Notre Dame
-        const conf = window.CFB_TEAM_TO_CONF?.[fullName];
-        if (!conf) return false;
-        if (val === "notre dame") return conf.toLowerCase() === "independent";
-        return conf.toLowerCase() === val;
-      }
-      return true;
-    };
+  const nflMap = window.NFL_TEAM_TO_DIVISION;
+  const mlbMap = window.MLB_TEAM_TO_DIVISION;
+  const cfbMap = window.CFB_TEAM_TO_CONF;
 
-    return teamMatches(game.awayFull) || teamMatches(game.homeFull);
-  }
+  const away = _norm(game.awayFull);
+  const home = _norm(game.homeFull);
 
+  const teamMatches = (fullName) => {
+    if (sportKey === "mlb" && mlbMap) {
+      const div = _norm(mlbMap[fullName] || "");
+      return !!div && div === val;
+    }
+    if (sportKey === "nfl" && nflMap) {
+      const div = _norm(nflMap[fullName] || "");
+      return !!div && div === val;
+    }
+    if (sportKey === "sec" && cfbMap) {
+      const conf = _norm(cfbMap[fullName] || "");
+      if (!conf) return false;
+      if (val === "notre dame") return conf === "notre dame";
+      return conf === val;
+    }
+    // If maps aren’t available for this sport, don’t filter out the game
+    return true;
+  };
+
+  return teamMatches(away) || teamMatches(home);
+}
   // Public API
   async function getOddsFor(sportKey) {
     const sportApi = SPORT_TO_API[sportKey];
@@ -241,5 +248,6 @@ function buildFiltersUI(sportKey) {
   // Expose
   window.OddsService = { getOddsFor };
 })();
+
 
 
