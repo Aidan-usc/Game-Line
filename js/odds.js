@@ -1,29 +1,32 @@
 // js/odds.js
 (function () {
   const API = "https://api.the-odds-api.com/v4";
-  const KEY = window.ODDS_API_KEY || "85bd97903b7fe6cc8850b02f70e25ade";
+  // Use config.js if present; otherwise fall back to the inline key you had
+  const KEY = (window.ODDS_API_KEY && String(window.ODDS_API_KEY)) || "85bd97903b7fe6cc8850b02f70e25ade";
   const REGIONS = "us";
   const MARKETS = "h2h,totals";
   const ODDS_FMT = "american";
 
-  // windows
+  // Windows
   const WINDOW_DAYS = {
     mlb: 5,
     nfl: 9,
     sec: 9, // sec == CFB
   };
 
-  // map page keys to API sport keys
+  // Page key -> Odds API key
   const SPORT_TO_API = {
     mlb: "baseball_mlb",
     nfl: "americanfootball_nfl",
     sec: "americanfootball_ncaaf",
   };
 
-  // book priority
+  // Bookmaker priority
   const BOOKS = ["draftkings", "fanduel", "betmgm", "caesars", "pointsbetus", "barstool"];
 
-  // util
+  // ---- Helpers ----
+  const norm = (window.__NAME_NORM__) || (s => String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim());
+
   const addDays = (d, n) => {
     const t = new Date(d);
     t.setDate(t.getDate() + n);
@@ -40,17 +43,32 @@
     } catch { return ""; }
   }
 
-  // choose a bookmaker in our priority list
+  // Variable TTL in-memory cache (per sport)
+  // <= 24h -> 20m, <=48h -> 60m, >48h -> 120m
+  const _CACHE = {}; // { [sportKey]: { expires:number, raw:any[] } }
+
+  function chooseTTLMillis(events) {
+    const now = Date.now();
+    const minsUntil = (dt) => (new Date(dt).getTime() - now) / 60000;
+    let minMinutes = Infinity;
+    for (const e of events || []) {
+      const m = minsUntil(e.commence_time);
+      if (m < minMinutes) minMinutes = m;
+    }
+    if (!isFinite(minMinutes)) return 120 * 60 * 1000; // 2h default
+    if (minMinutes <= 24 * 60) return 20 * 60 * 1000;  // 20 min day-of
+    if (minMinutes <= 48 * 60) return 60 * 60 * 1000;  // 1 hour for 1–2 days
+    return 120 * 60 * 1000;                            // 2 hours for 3+ days
+  }
+
   function chooseBook(bookmakers) {
     const byKey = {};
     for (const b of bookmakers || []) byKey[b.key] = b;
-    for (const pref of BOOKS) {
-      if (byKey[pref]) return byKey[pref];
-    }
+    for (const pref of BOOKS) if (byKey[pref]) return byKey[pref];
     return bookmakers?.[0];
   }
 
-  // build game rows that parlay.js expects
+  // Build game rows that parlay.js expects
   function mapEventToGame(evt, sportKey) {
     const apiBook = chooseBook(evt.bookmakers || []);
     const markets = apiBook?.markets || [];
@@ -60,28 +78,29 @@
     // Moneyline
     let mlAway = null, mlHome = null;
     if (h2h?.outcomes?.length) {
-      // find by name
       const oAway = h2h.outcomes.find(o => o.name === evt.away_team);
       const oHome = h2h.outcomes.find(o => o.name === evt.home_team);
       mlAway = oAway?.price ?? null;
       mlHome = oHome?.price ?? null;
     }
 
-    // Totals: pick the total line if present
+    // Totals
     let total = null, over = null, under = null;
     if (totals?.outcomes?.length) {
-      const overO = totals.outcomes.find(o => o.name?.toLowerCase() === "over");
-      const underO = totals.outcomes.find(o => o.name?.toLowerCase() === "under");
+      const overO = totals.outcomes.find(o => norm(o.name) === "over");
+      const underO = totals.outcomes.find(o => norm(o.name) === "under");
       total = overO?.point ?? underO?.point ?? null;
       over = overO?.price ?? null;
       under = underO?.price ?? null;
     }
 
-    // Location: we can’t get a stadium city from API without a second dataset; use home team city as a reasonable label
+    // Location label fallback = home "city part"
     const homeCity = evt.home_team.split(" ").slice(0, -1).join(" ") || evt.home_team;
+    const ts = new Date(evt.commence_time).getTime();
 
     return {
       id: evt.id,
+      ts,                                  // numeric timestamp for reliable sorting
       time: fmtDT(evt.commence_time),
       location: homeCity,
       awayFull: evt.away_team,
@@ -93,109 +112,107 @@
     };
   }
 
-  // Filters UI
-// Filters UI
-function buildFiltersUI(sportKey) {
-  const wrap = document.getElementById("filters");
-  if (!wrap) return;
+  // ---- Filters UI ----
+  function buildFiltersUI(sportKey) {
+    const wrap = document.getElementById("filters");
+    if (!wrap) return;
 
-  // Label text changes for CFB
-  const labelText = sportKey === "sec" ? "Conference" : "Division";
+    const labelText = sportKey === "sec" ? "Conference" : "Division";
 
-  wrap.innerHTML = `
-    <div class="filter-bar-inner">
-      <div class="filter-left">
-        <label class="filter-label" for="filter-league">${labelText}</label>
-        <div class="select-wrap">
-          <select id="filter-league" class="filter-select" aria-label="${labelText} filter"></select>
+    wrap.innerHTML = `
+      <div class="filter-bar-inner">
+        <div class="filter-left">
+          <label class="filter-label" for="filter-league">${labelText}</label>
+          <div class="select-wrap">
+            <select id="filter-league" class="filter-select" aria-label="${labelText} filter"></select>
+          </div>
+        </div>
+
+        <div class="filter-right">
+          <div class="search-wrap">
+            <input id="filter-search" class="filter-search" type="search"
+                   placeholder="Search teams…" aria-label="Search teams">
+          </div>
+          <button id="filter-refresh" class="btn btn-refresh" type="button" title="Refresh odds">↻</button>
         </div>
       </div>
+    `;
 
-      <div class="filter-right">
-        <div class="search-wrap">
-          <input id="filter-search" class="filter-search" type="search" placeholder="Search teams…" aria-label="Search teams">
-        </div>
-        <button id="filter-refresh" class="btn btn-refresh" type="button" title="Refresh odds">↻</button>
-      </div>
-    </div>
-  `;
+    // Options by sport
+    const sel = document.getElementById("filter-league");
+    const opts =
+      sportKey === "mlb" ? [
+        "All",
+        "AL East","AL Central","AL West",
+        "NL East","NL Central","NL West"
+      ] :
+      sportKey === "nfl" ? [
+        "All",
+        "AFC East","AFC North","AFC South","AFC West",
+        "NFC East","NFC North","NFC South","NFC West"
+      ] :
+      [
+        "All (Power 4 + ND)",
+        "SEC","Big Ten","Big 12","ACC","Notre Dame"
+      ];
 
-  // options by sport
-  const sel = document.getElementById("filter-league");
-  const opts =
-    sportKey === "mlb" ? [
-      "All",
-      "AL East","AL Central","AL West",
-      "NL East","NL Central","NL West"
-    ] :
-    sportKey === "nfl" ? [
-      "All",
-      "AFC East","AFC North","AFC South","AFC West",
-      "NFC East","NFC North","NFC South","NFC West"
-    ] :
-    // CFB (Power 4 + ND)
-    [
-      "All (Power 4 + ND)",
-      "SEC","Big Ten","Big 12","ACC","Notre Dame"
-    ];
-
-  for (const o of opts) {
-    const el = document.createElement("option");
-    el.value = o; el.textContent = o;
-    sel.appendChild(el);
+    for (const o of opts) {
+      const el = document.createElement("option");
+      el.value = o; el.textContent = o;
+      sel.appendChild(el);
+    }
   }
-}
 
-const _norm = s => String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+  // Robust division/conf matching using normalized maps from meta.js
+  function matchDivisionConf(sportKey, filterValue, game) {
+    const val = norm(filterValue || "");
+    if (!val || val.startsWith("all")) return true;
 
-// Reuse the same normalizer used in meta.js
-const _norm = (window.__NAME_NORM__) || (s => String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim());
+    const nflMap = window.NFL_TEAM_TO_DIVISION;
+    const mlbMap = window.MLB_TEAM_TO_DIVISION;
+    const cfbMap = window.CFB_TEAM_TO_CONF;
 
-// Filtering logic (robust; graceful fallback)
-function matchDivisionConf(sportKey, filterValue, game) {
-  const val = _norm(filterValue || "");
-  if (!val || val.startsWith("all")) return true;
+    const away = norm(game.awayFull);
+    const home = norm(game.homeFull);
 
-  const nflMap = window.NFL_TEAM_TO_DIVISION;
-  const mlbMap = window.MLB_TEAM_TO_DIVISION;
-  const cfbMap = window.CFB_TEAM_TO_CONF;
+    const teamMatches = (fullName) => {
+      if (sportKey === "mlb" && mlbMap) {
+        const div = norm(mlbMap[fullName] || "");
+        return !!div && div === val;
+      }
+      if (sportKey === "nfl" && nflMap) {
+        const div = norm(nflMap[fullName] || "");
+        return !!div && div === val;
+      }
+      if (sportKey === "sec" && cfbMap) {
+        const conf = norm(cfbMap[fullName] || "");
+        if (!conf) return false;
+        if (val === "notre dame") return conf === "notre dame";
+        return conf === val;
+      }
+      // If mapping not available, don't exclude
+      return true;
+    };
 
-  const away = _norm(game.awayFull);
-  const home = _norm(game.homeFull);
+    return teamMatches(away) || teamMatches(home);
+  }
 
-  const teamMatches = (fullName) => {
-    if (sportKey === "mlb" && mlbMap) {
-      const div = _norm(mlbMap[fullName] || "");
-      return div && div === val;
-    }
-    if (sportKey === "nfl" && nflMap) {
-      const div = _norm(nflMap[fullName] || "");
-      return div && div === val;
-    }
-    if (sportKey === "sec" && cfbMap) {
-      const conf = _norm(cfbMap[fullName] || "");
-      if (!conf) return false;
-      if (val === "notre dame") return conf === "notre dame";
-      return conf === val;
-    }
-    // If mapping missing for this sport, don't block the game
-    return true;
-  };
-
-  // Keep the game if either team matches the selected bucket
-  const hit = teamMatches(away) || teamMatches(home);
-  return !!hit;
-}
-
-  // Public API
+  // ---- Public API ----
   async function getOddsFor(sportKey) {
     const sportApi = SPORT_TO_API[sportKey];
     if (!sportApi) throw new Error(`Unknown sport key: ${sportKey}`);
     if (!KEY) throw new Error("Missing API key (window.ODDS_API_KEY)");
 
-    const now = new Date();
-    const end = addDays(now, WINDOW_DAYS[sportKey] || 5);
+    // cache hit?
+    const hit = _CACHE[sportKey];
+    const nowMs = Date.now();
+    if (hit && hit.expires > nowMs) {
+      const cachedGames = mapAndFilter(hit.raw, sportKey);
+      wireFiltersAndRender(sportKey, cachedGames);
+      return cachedGames;
+    }
 
+    const end = addDays(new Date(), WINDOW_DAYS[sportKey] || 5);
     const url = new URL(`${API}/sports/${sportApi}/odds`);
     url.searchParams.set("apiKey", KEY);
     url.searchParams.set("regions", REGIONS);
@@ -203,7 +220,6 @@ function matchDivisionConf(sportKey, filterValue, game) {
     url.searchParams.set("oddsFormat", ODDS_FMT);
     url.searchParams.set("dateFormat", "iso");
 
-    // Fetch all upcoming; we'll filter by commence_time window client side.
     const res = await fetch(url.toString());
     if (!res.ok) {
       const txt = await res.text();
@@ -211,18 +227,31 @@ function matchDivisionConf(sportKey, filterValue, game) {
     }
     const json = await res.json();
 
-    // Filter by window and map to our game cards
-    const games = (json || [])
-      .filter(e => new Date(e.commence_time) <= end)
-      .map(e => mapEventToGame(e, sportKey));
+    // keep only events within our window to the client
+    const upcoming = (json || []).filter(e => new Date(e.commence_time) <= end);
 
-    // Sort by time
-    games.sort((a, b) => new Date(a.time) - new Date(b.time));
+    // set cache
+    _CACHE[sportKey] = {
+      raw: upcoming,
+      expires: nowMs + chooseTTLMillis(upcoming)
+    };
 
-    // Build filters UI (once) and wire up live filtering
+    const games = mapAndFilter(upcoming, sportKey);
+    wireFiltersAndRender(sportKey, games);
+    return games;
+  }
+
+  // Map, sort, and return list shaped for rendering
+  function mapAndFilter(events, sportKey) {
+    const games = (events || []).map(e => mapEventToGame(e, sportKey));
+    games.sort((a, b) => a.ts - b.ts);
+    return games;
+  }
+
+  // Build filters, attach handlers, and render initial list
+  function wireFiltersAndRender(sportKey, games) {
     buildFiltersUI(sportKey);
 
-    // Wire up filters
     const sel = document.getElementById("filter-league");
     const search = document.getElementById("filter-search");
     const refresh = document.getElementById("filter-refresh");
@@ -235,27 +264,23 @@ function matchDivisionConf(sportKey, filterValue, game) {
         const hitsBucket = matchDivisionConf(sportKey, bucket, g);
         return hitsText && hitsBucket;
       });
-      // Re-render the grid with the new list
-      if (window.reRenderOdds) window.reRenderOdds(filtered);
+      window.reRenderOdds && window.reRenderOdds(filtered);
     }
 
     sel && sel.addEventListener("change", applyFilters);
-    search && search.addEventListener("input", () => {
-      // cheap debounce
-      clearTimeout(applyFilters._t);
-      applyFilters._t = setTimeout(applyFilters, 120);
-    });
+    if (search) {
+      let t;
+      search.addEventListener("input", () => {
+        clearTimeout(t);
+        t = setTimeout(applyFilters, 120);
+      });
+    }
     refresh && refresh.addEventListener("click", () => location.reload());
 
     // Initial render
-    if (window.reRenderOdds) window.reRenderOdds(games);
-    return games;
+    window.reRenderOdds && window.reRenderOdds(games);
   }
 
   // Expose
   window.OddsService = { getOddsFor };
 })();
-
-
-
-
