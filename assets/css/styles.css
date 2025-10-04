@@ -688,7 +688,6 @@ body {
   .filter-right { margin-left: 0; }
   .filter-search { min-width: 0; width: 100%; }
 }
-
 /* =========================
    RIGHT RAIL — refreshed
    ========================= */
@@ -745,4 +744,69 @@ body {
   border-radius: 14px;
   padding: 10px 12px;
   margin-bottom: 10px;
-  box-shadow: 0 6px 16px rgba(59,
+  box-shadow: 0 6px 16px rgba(59,30,118,.06);
+  transition: transform .08s ease, box-shadow .15s ease, border-color .15s ease;
+}
+.leg-card:hover{
+  transform: translateY(-1px);
+  border-color: rgba(59,30,118,.35);
+  box-shadow: 0 10px 24px rgba(59,30,118,.12);
+}
+
+/* logo square */
+.leg-logo{
+  width: 48px; height: 48px; display:grid; place-items:center;
+  background:white; border:1px solid #eee; border-radius:10px;
+}
+.leg-logo img{ width:40px; height:40px; object-fit:contain; }
+
+/* names block: keep your 5-line structure but tighten it */
+.leg-names{ line-height:1.05; }
+.leg-names .name-city{ font-size:13px; opacity:.85; }
+.leg-names .name-mascot{ font-size:16px; font-weight:800; color: var(--deep); }
+.leg-names .name-at{
+  font-family: var(--font-nav);
+  font-size:18px; color: #7a6db7; margin:4px 0; text-align:center;
+}
+
+/* right meta column */
+.leg-meta{ display:flex; flex-direction:column; align-items:flex-end; gap:6px; }
+.odds-pill{
+  display:inline-block; padding:4px 10px;
+  background: var(--indigo); color: var(--maize);
+  border-radius: 999px; font-family: var(--font-nav); font-weight:800;
+}
+.market-badge{
+  font-size:11px; padding:2px 8px; border-radius:999px;
+  background: rgba(59,30,118,.08); color: #5a4aa8; font-weight:700;
+}
+.remove{
+  cursor:pointer; width:26px; height:26px; display:grid; place-items:center;
+  border-radius:50%; color:#8b7fd1;
+}
+.remove:hover{ background: rgba(59,30,118,.10); color: var(--indigo); }
+
+/* Footer (pinned summary) */
+.rail-footer{
+  padding: 10px 12px 14px;
+  background: radial-gradient(120% 80% at 50% 0%, rgba(20,1,22,.04), rgba(20,1,22,0));
+  border-top: 1px dashed rgba(59,30,118,.20);
+}
+.rail-summary{ display:grid; gap:10px; }
+.rail-summary .row{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+#wager{
+  width: 140px; padding: 10px 12px; border-radius: 12px;
+  border:1px solid #e1dbff; font-size:16px; background:#fff;
+}
+.btn-block{ width:100%; }
+.btn-primary{
+  background: var(--indigo); color: var(--maize); border:2px solid var(--maize);
+  border-radius: 16px; padding: 14px 16px; font-family: var(--font-nav); font-size:18px;
+}
+.btn-primary:disabled{ opacity:.55; cursor:not-allowed; }
+.btn-primary:hover:not(:disabled){ filter: brightness(1.02); transform: translateY(-1px); }
+
+/* Mobile fallbacks */
+@media (max-width: 1100px){
+  .parlay-rail{ position:static; width:auto; height:auto; right:auto; bottom:auto; }
+}
