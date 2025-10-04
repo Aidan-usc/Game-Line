@@ -323,3 +323,134 @@ body {
   .primary-nav{ gap:14px; }
   .primary-nav a{ font-size:18px; }
 }
+
+/* =========================
+   HOME PAGE QUICK RESTORE
+   ========================= */
+
+/* Center the home content and give it breathing room */
+.page-content.no-rail {
+  max-width: 1100px;
+  margin: 0 auto;               /* center */
+  padding: 28px 20px;           /* comfortable edge padding */
+}
+
+/* Typographic scale for home text */
+.page-content.no-rail h1 {
+  font-family: var(--font-nav);
+  font-size: clamp(28px, 4.2vw, 44px);
+  line-height: 1.1;
+  color: var(--deep);
+  margin: 0 0 12px 0;
+}
+.page-content.no-rail h2 {
+  font-family: var(--font-nav);
+  font-size: clamp(22px, 3.2vw, 30px);
+  margin: 22px 0 10px;
+  color: var(--indigo);
+}
+.page-content.no-rail h3 {
+  font-family: var(--font-nav);
+  font-size: clamp(18px, 2.4vw, 22px);
+  margin: 16px 0 8px;
+}
+.page-content.no-rail p {
+  max-width: 70ch;
+  line-height: 1.6;
+  margin: 10px 0 14px;
+}
+.page-content.no-rail ul {
+  padding-left: 1.2rem;
+  margin: 8px 0 14px;
+}
+.page-content.no-rail strong { color: var(--deep); }
+
+/* Buttons in hero/lead rows */
+.page-content.no-rail .btn { margin-right: 8px; }
+
+/* Featured leagues links line */
+.home-featured,
+.page-content.no-rail .featured-leagues {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  margin: 10px 0 18px;
+}
+.home-chip,
+.page-content.no-rail .featured-leagues a {
+  display: inline-block;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 2px solid var(--indigo);
+  color: var(--indigo);
+  background: #fff;
+  text-decoration: none;
+  font-family: var(--font-body);
+  font-size: 14px;
+}
+.home-chip:hover,
+.page-content.no-rail .featured-leagues a:hover {
+  background: rgba(59,30,118,.06);
+}
+
+/* Optional hero (if your index.html still uses .hero/.hero-bg) */
+.home-hero,
+.hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0 0 var(--radius) var(--radius);
+  box-shadow: var(--shadow);
+  margin-bottom: 18px;
+  min-height: 44vh;
+}
+.home-hero .hero-bg,
+.hero .hero-bg {
+  position: absolute;
+  inset: 0;
+  background-image:
+    url("../img/hero_image.png"),
+    linear-gradient(135deg, var(--indigo), var(--deep));
+  background-repeat: no-repeat, no-repeat;
+  background-size: auto, cover;
+  background-position: right -110px bottom -520px, center;
+  z-index: -1;
+}
+.home-hero .hero-overlay,
+.hero .hero-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(20,1,22,0.25), rgba(20,1,22,0.65));
+}
+.home-hero .hero-content,
+.hero .hero-content {
+  position: relative; z-index: 1;
+  padding: 44px 24px;
+  padding-right: clamp(220px, 38vw, 560px);
+  color: #fff;
+  text-shadow: 0 2px 8px rgba(0,0,0,.35);
+}
+.home-hero .hero-content h1,
+.hero .hero-content h1 {
+  font-family: var(--font-nav);
+  color: var(--maize);
+  font-size: clamp(32px, 5vw, 56px);
+  margin: 0 0 10px 0;
+}
+.home-hero .hero-actions,
+.hero .hero-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+/* Small polish for inline “How it works” link row */
+.page-content.no-rail .inline-links a {
+  color: var(--indigo);
+  text-decoration: underline;
+}
+.page-content.no-rail .inline-links a:hover { color: var(--deep); }
+
+/* Make sure the fixed header never overlaps the first line */
+@media (min-width: 600px) {
+  .page-content.no-rail { padding-top: 32px; }
+}
