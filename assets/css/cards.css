@@ -37,14 +37,20 @@
   gap:10px; align-items:center; padding:12px; text-align:center;
 }
 .team{ display:grid; grid-template-rows:auto auto auto; justify-items:center; gap:6px; }
+/* Make every logo sit inside a consistent optical frame */
 .team-logo{
-  /* slightly smaller logos to reduce card height */
-  width:clamp(60px,7vw,82px);
-  height:clamp(60px,7vw,82px);
-  object-fit:contain;
-  border:none; background:transparent;
-  border-radius:8px; /* set 0 if you prefer hard square */
+  /* keep your current size constraints if you like */
+  width: clamp(78px, 10vw, 104px);
+  height: clamp(78px, 10vw, 104px);
+
+  object-fit: contain;
+  /* add breathing room so tight-cropped logos don't look bigger */
+  max-width: 86%;
+  max-height: 86%;
+  padding: 6px;             /* internal cushion */
+  box-sizing: content-box;   /* padding doesn't shrink the image % */
 }
+
 .team-city{ font-size:13px; line-height:1.1; }
 .team-mascot{ font-size:15px; font-weight:800; line-height:1.05; }
 
