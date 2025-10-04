@@ -1,34 +1,37 @@
 <!-- assets/partials/rail.html -->
-<aside class="parlay-rail mode-bets" id="parlay-rail" aria-label="Parlay">
-  <div class="rail-header">
-    <h2 class="rail-title" id="rail-title">Bets in Play</h2>
-  </div>
-
-  <!-- Scrollable middle area -->
-  <div class="rail-scroll" id="rail-scroll">
-    <!-- PARLAY LEGS (hidden in bets mode) -->
-    <ul id="parlay-legs" class="legs"></ul>
-
-    <!-- BETS IN PLAY (visible in bets mode) -->
-    <div id="bets-container">
-      <ul id="bets-in-play" class="bets">
-        <li class="empty">No bets in play yet.</li>
-      </ul>
+<aside id="parlay-rail" class="parlay-rail">
+  <header class="rail-header">
+    <div class="rail-title-row">
+      <h2 id="rail-title" class="rail-title">Bets in Play</h2>
+      <button id="clear-parlay" class="rail-clear" type="button" aria-label="Clear all">Clear</button>
     </div>
-  </div>
+    <p class="rail-sub">Selections appear here as you tap odds.</p>
+  </header>
 
-  <!-- Bottom widget (only visible in parlay mode) -->
-  <div class="rail-footer" id="rail-footer">
+  <section class="rail-body">
+    <ul id="parlay-legs" class="legs">
+      <!-- legs injected here -->
+    </ul>
+  </section>
+
+  <footer class="rail-footer">
     <div class="rail-summary">
-      <div><span>Total Odds</span><strong id="total-odds">+0</strong></div>
-      <div class="wager-row">
-        <label for="wager">Wager (USD)</label>
-        <input id="wager" type="number" min="1" value="10" />
+      <div class="row odds-row">
+        <span>Total Odds</span>
+        <strong id="total-odds">+0</strong>
       </div>
-      <div><span>Projected Payout</span><strong id="payout">$0.00</strong></div>
-    </div>
 
-    <button id="submit-parlay" class="btn btn-primary btn-block" disabled>Submit Parlay</button>
-    <button id="clear-parlay" class="btn btn-ghost btn-block">Clear</button>
-  </div>
+      <label class="row wager-row" for="wager">
+        <span>Wager (USD)</span>
+        <input id="wager" type="number" min="1" step="1" value="10" inputmode="numeric" />
+      </label>
+
+      <div class="row payout-row">
+        <span>Projected Payout</span>
+        <strong id="payout">$0.00</strong>
+      </div>
+
+      <button id="submit-parlay" class="btn btn-block btn-primary" disabled>Submit Parlay</button>
+    </div>
+  </footer>
 </aside>
