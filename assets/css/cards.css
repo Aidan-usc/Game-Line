@@ -108,3 +108,7 @@
 .pick-btn.selected:hover{
   background:var(--indigo); color:var(--maize); border-color:var(--indigo);
 }
+
+/* Align the @ with the first line of team text */
+.gc-center { align-items: flex-start; }
+.at { align-self: flex-start; margin-top: 6px; }
