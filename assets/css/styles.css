@@ -325,132 +325,172 @@ body {
 }
 
 /* =========================
-   HOME PAGE QUICK RESTORE
+   HOME PAGE (extracted)
    ========================= */
 
-/* Center the home content and give it breathing room */
+/* Home pages don’t reserve space for the right rail */
 .page-content.no-rail {
-  max-width: 1100px;
-  margin: 0 auto;               /* center */
-  padding: 28px 20px;           /* comfortable edge padding */
+  margin-right: 0;
+  margin-top: 0;
 }
 
-/* Typographic scale for home text */
-.page-content.no-rail h1 {
-  font-family: var(--font-nav);
-  font-size: clamp(28px, 4.2vw, 44px);
-  line-height: 1.1;
-  color: var(--deep);
-  margin: 0 0 12px 0;
-}
-.page-content.no-rail h2 {
-  font-family: var(--font-nav);
-  font-size: clamp(22px, 3.2vw, 30px);
-  margin: 22px 0 10px;
-  color: var(--indigo);
-}
-.page-content.no-rail h3 {
-  font-family: var(--font-nav);
-  font-size: clamp(18px, 2.4vw, 22px);
-  margin: 16px 0 8px;
-}
-.page-content.no-rail p {
-  max-width: 70ch;
-  line-height: 1.6;
-  margin: 10px 0 14px;
-}
-.page-content.no-rail ul {
-  padding-left: 1.2rem;
-  margin: 8px 0 14px;
-}
-.page-content.no-rail strong { color: var(--deep); }
-
-/* Buttons in hero/lead rows */
-.page-content.no-rail .btn { margin-right: 8px; }
-
-/* Featured leagues links line */
-.home-featured,
-.page-content.no-rail .featured-leagues {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px 16px;
-  margin: 10px 0 18px;
-}
-.home-chip,
-.page-content.no-rail .featured-leagues a {
-  display: inline-block;
-  padding: 8px 12px;
-  border-radius: 999px;
-  border: 2px solid var(--indigo);
-  color: var(--indigo);
-  background: #fff;
-  text-decoration: none;
-  font-family: var(--font-body);
-  font-size: 14px;
-}
-.home-chip:hover,
-.page-content.no-rail .featured-leagues a:hover {
-  background: rgba(59,30,118,.06);
-}
-
-/* Optional hero (if your index.html still uses .hero/.hero-bg) */
-.home-hero,
+/* HERO */
 .hero {
   position: relative;
   overflow: hidden;
   border-radius: 0 0 var(--radius) var(--radius);
   box-shadow: var(--shadow);
-  margin-bottom: 18px;
-  min-height: 44vh;
+  min-height: 60vh;
 }
-.home-hero .hero-bg,
-.hero .hero-bg {
+
+/* Collage anchored to right/bottom + gradient behind it */
+.hero-bg {
   position: absolute;
   inset: 0;
+
+  /* topmost layer first (collage), gradient behind */
   background-image:
     url("../img/hero_image.png"),
     linear-gradient(135deg, var(--indigo), var(--deep));
   background-repeat: no-repeat, no-repeat;
-  background-size: auto, cover;
-  background-position: right -110px bottom -520px, center;
+
+  /* tune size/position as needed */
+  background-size: auto;
+  background-position: right -110px bottom -500px, center;
   z-index: -1;
 }
-.home-hero .hero-overlay,
-.hero .hero-overlay {
-  position: absolute; inset: 0;
-  background: linear-gradient(180deg, rgba(20,1,22,0.25), rgba(20,1,22,0.65));
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(20,1,22,0.35) 0%,
+    rgba(20,1,22,0.55) 45%,
+    rgba(20,1,22,0.75) 100%
+  );
 }
-.home-hero .hero-content,
-.hero .hero-content {
-  position: relative; z-index: 1;
-  padding: 44px 24px;
-  padding-right: clamp(220px, 38vw, 560px);
-  color: #fff;
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  padding: 64px 24px;
+  padding-right: clamp(260px, 40vw, 620px);
+  max-width: 1200px;
+  margin: 0 auto;
+  color: white;
   text-shadow: 0 2px 8px rgba(0,0,0,.35);
 }
-.home-hero .hero-content h1,
-.hero .hero-content h1 {
+
+.hero-content h1 {
   font-family: var(--font-nav);
+  font-size: clamp(34px, 5vw, 56px);
   color: var(--maize);
-  font-size: clamp(32px, 5vw, 56px);
-  margin: 0 0 10px 0;
+  margin: 0 0 12px 0;
+  letter-spacing: .5px;
 }
-.home-hero .hero-actions,
-.hero .hero-actions {
+
+.hero-content p {
+  max-width: 800px;
+  font-size: clamp(16px, 2.2vw, 20px);
+  margin: 0 0 20px 0;
+}
+
+.hero-actions {
   display: flex;
-  gap: 12px;
+  gap: 14px;
   flex-wrap: wrap;
-  margin-top: 12px;
 }
 
-/* Small polish for inline “How it works” link row */
-.page-content.no-rail .inline-links a {
+/* BUTTONS (used on home hero/CTA) */
+.btn {
+  display: inline-block;
+  padding: 12px 18px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-family: var(--font-nav);
+  font-size: 18px;
+  transition: transform .06s ease, opacity .2s ease;
+}
+.btn:active { transform: translateY(1px); }
+
+.btn-primary {
+  background: var(--indigo);
+  color: var(--maize);
+  border: 2px solid var(--maize);
+}
+.btn-primary:hover {
+  background: var(--deep);
+  color: var(--maize);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: white;
+  border: 2px solid rgba(255,255,255,.8);
+}
+.btn-ghost:hover { background: rgba(255,255,255,.1); }
+
+/* CONTENT SECTIONS ON HOME */
+.section {
+  padding: 40px 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.section-title {
+  font-family: var(--font-nav);
+  font-size: 28px;
+  color: var(--deep);
+  margin: 0 0 16px 0;
+}
+
+/* CARDS / TILES (info blocks & league tiles) */
+.card-grid { display: grid; gap: 16px; }
+.card-grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+.info-card {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 18px 18px 20px;
+  border-left: 4px solid var(--indigo);
+}
+.info-card h3 {
+  margin: 0 0 6px 0;
+  font-size: 20px;
   color: var(--indigo);
-  text-decoration: underline;
+  font-family: var(--font-nav);
 }
-.page-content.no-rail .inline-links a:hover { color: var(--deep); }
+.info-card p { margin: 0; line-height: 1.5; }
 
-/* Make sure the fixed header never overlaps the first line */
-@media (min-width: 600px) {
-  .page-content.no-rail { padding-top: 32px; }
+.league-tile {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 20px;
+  background: linear-gradient(180deg, white, #fff7);
+  border: 2px solid var(--indigo);
+  border-radius: var(--radius);
+  text-decoration: none;
+  box-shadow: var(--shadow);
+  min-height: 140px;
 }
+.league-acronym { font-family: var(--font-nav); font-size: 36px; color: var(--indigo); }
+.league-cta { font-family: var(--font-body); color: var(--deep); }
+
+/* CTA block on home */
+.section-cta .cta-card {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  border: 2px solid var(--indigo);
+  padding: 26px;
+  text-align: center;
+}
+.section-cta h2 { margin: 0 0 8px 0; }
+.section-cta p { margin: 0 0 16px 0; }
+
+/* HOME responsive tweaks */
+@media (max-width: 1024px) { .card-grid.three { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 680px)  { .card-grid.three { grid-template-columns: 1fr; } }
