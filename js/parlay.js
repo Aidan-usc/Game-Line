@@ -312,42 +312,60 @@
     submitBtn && (submitBtn.disabled = state.legs.length === 0);
   }
 
-// inside js/parlay.js – replace the whole renderLeg() function
 function renderLeg(l) {
-  const a = l.away || {city:"", mascot:"", full: (l.away?.city ? `${l.away.city} ${l.away.mascot}` : "")};
-  const h = l.home || {city:"", mascot:"", full: (l.home?.city ? `${l.home.city} ${l.home.mascot}` : "")};
+  const sportKey = (typeof state?.sport === "string") ? state.sport : "mlb";
 
-  const marketLabel = (l.market === "ml")
-    ? "Moneyline"
-    : (l.selection[0].toUpperCase() + l.selection.slice(1) + (l.line ? ` ${l.line}` : ""));
-
-  const sportKey = (window && window.initParlayPage && (typeof state?.sport === 'string')) ? state.sport : 'mlb';
-  const awayFull = a.full || `${a.city} ${a.mascot}`.trim();
-  const homeFull = h.full || `${h.city} ${h.mascot}`.trim();
+  const away = l.away || { city:"", mascot:"", full:"" };
+  const home = l.home || { city:"", mascot:"", full:"" };
+  const awayFull = away.full || `${away.city} ${away.mascot}`.trim();
+  const homeFull = home.full || `${home.city} ${home.mascot}`.trim();
 
   const awayLogo = (window.LogoFinder && window.LogoFinder.get) ? window.LogoFinder.get(awayFull, sportKey) : "";
   const homeLogo = (window.LogoFinder && window.LogoFinder.get) ? window.LogoFinder.get(homeFull, sportKey) : "";
 
+  const isML = l.market === "ml";
+  const marketLabel = isML
+    ? "Moneyline"
+    : (l.selection[0].toUpperCase() + l.selection.slice(1) + (l.line ? ` ${l.line}` : ""));
+
+  // logo block: selected team for ML, diagonal split for totals
+  let logoBlock = "";
+  if (isML) {
+    const pick = (l.selection === "away") ? awayLogo : homeLogo;
+    logoBlock = `
+      <div class="leg-logo">
+        <img src="${pick}" alt="${l.selection === "away" ? awayFull : homeFull} logo" onerror="this.style.visibility='hidden'">
+      </div>`;
+  } else {
+    logoBlock = `
+      <div class="leg-logo diagonal-logos">
+        <img class="away" src="${awayLogo}" alt="${awayFull} logo" onerror="this.style.visibility='hidden'">
+        <img class="home" src="${homeLogo}" alt="${homeFull} logo" onerror="this.style.visibility='hidden'">
+      </div>`;
+  }
+
   return `
     <li class="leg-card">
-      <div class="leg-logo"><img src="${awayLogo}" alt="${awayFull} logo" onerror="this.style.visibility='hidden'"></div>
+      <button class="remove leg-x" title="Remove" data-id="${l.id}">×</button>
+
+      ${logoBlock}
 
       <div class="leg-names">
-        <div class="name-city">${a.city}</div>
-        <div class="name-mascot">${a.mascot}</div>
+        <div class="name-city">${away.city}</div>
+        <div class="name-mascot">${away.mascot}</div>
         <div class="name-at">@</div>
-        <div class="name-city">${h.city}</div>
-        <div class="name-mascot">${h.mascot}</div>
+        <div class="name-city">${home.city}</div>
+        <div class="name-mascot">${home.mascot}</div>
       </div>
 
       <div class="leg-meta">
-        <span class="odds-pill">${formatAmerican(l.odds)}</span>
-        <span class="market-badge">${marketLabel}</span>
-        <span class="remove" title="Remove" data-id="${l.id}">✕</span>
+        <span class="market-top">${marketLabel}</span>
+        <span class="odds-text">${formatAmerican(l.odds)}</span>
       </div>
     </li>
   `;
 }
+
 
 
   /* ---------------------------
@@ -409,4 +427,5 @@ function renderLeg(l) {
     ];
   }
 })();
+
 
