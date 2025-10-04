@@ -312,28 +312,43 @@
     submitBtn && (submitBtn.disabled = state.legs.length === 0);
   }
 
-  function renderLeg(l) {
-    const a = l.away || { city: "", mascot: "" };
-    const h = l.home || { city: "", mascot: "" };
-    const marketLabel =
-      l.market === "ml"
-        ? "Moneyline"
-        : (l.selection[0].toUpperCase() + l.selection.slice(1) + (l.line ? ` ${l.line}` : ""));
-    return `<li class="leg">
-      <div class="names">
+// inside js/parlay.js – replace the whole renderLeg() function
+function renderLeg(l) {
+  const a = l.away || {city:"", mascot:"", full: (l.away?.city ? `${l.away.city} ${l.away.mascot}` : "")};
+  const h = l.home || {city:"", mascot:"", full: (l.home?.city ? `${l.home.city} ${l.home.mascot}` : "")};
+
+  const marketLabel = (l.market === "ml")
+    ? "Moneyline"
+    : (l.selection[0].toUpperCase() + l.selection.slice(1) + (l.line ? ` ${l.line}` : ""));
+
+  const sportKey = (window && window.initParlayPage && (typeof state?.sport === 'string')) ? state.sport : 'mlb';
+  const awayFull = a.full || `${a.city} ${a.mascot}`.trim();
+  const homeFull = h.full || `${h.city} ${h.mascot}`.trim();
+
+  const awayLogo = (window.LogoFinder && window.LogoFinder.get) ? window.LogoFinder.get(awayFull, sportKey) : "";
+  const homeLogo = (window.LogoFinder && window.LogoFinder.get) ? window.LogoFinder.get(homeFull, sportKey) : "";
+
+  return `
+    <li class="leg-card">
+      <div class="leg-logo"><img src="${awayLogo}" alt="${awayFull} logo" onerror="this.style.visibility='hidden'"></div>
+
+      <div class="leg-names">
         <div class="name-city">${a.city}</div>
         <div class="name-mascot">${a.mascot}</div>
         <div class="name-at">@</div>
         <div class="name-city">${h.city}</div>
         <div class="name-mascot">${h.mascot}</div>
       </div>
-      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
-        <span class="odds">${formatAmerican(l.odds)}</span>
-        <span class="meta" style="font-size:12px;opacity:.75;">${marketLabel}</span>
+
+      <div class="leg-meta">
+        <span class="odds-pill">${formatAmerican(l.odds)}</span>
+        <span class="market-badge">${marketLabel}</span>
         <span class="remove" title="Remove" data-id="${l.id}">✕</span>
       </div>
-    </li>`;
-  }
+    </li>
+  `;
+}
+
 
   /* ---------------------------
      Mock data (fallback only)
@@ -394,3 +409,4 @@
     ];
   }
 })();
+
