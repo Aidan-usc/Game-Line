@@ -1,3 +1,7 @@
+// Hide games X minutes after their posted kickoff time
+const POST_KICK_HIDE_MIN = 10;
+const POST_KICK_HIDE_MS  = POST_KICK_HIDE_MIN * 60 * 1000;
+
 // js/odds.js
 (function () {
   const API = "https://api.the-odds-api.com/v4";
@@ -7,14 +11,14 @@
   const MARKETS = "h2h,totals";
   const ODDS_FMT = "american";
 
-  // Windows
+  // Windows (lookahead, in days)
   const WINDOW_DAYS = {
     mlb: 5,
     nfl: 9,
     sec: 9, // sec == CFB
   };
 
-  // Page key -> Odds API key
+  // Page key -> Odds API sport key
   const SPORT_TO_API = {
     mlb: "baseball_mlb",
     nfl: "americanfootball_nfl",
@@ -27,22 +31,24 @@
   // ---- Helpers ----
   const norm = (window.__NAME_NORM__) || (s => String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim());
 
-// after: const norm = (window.__NAME_NORM__) || (...)
-function canonTeamName(sportKey, name) {
-  const n = norm(name);
-  const al = (window.TEAM_ALIASES && window.TEAM_ALIASES[sportKey]) || {};
-  return al[n] || n;
-}
+  function canonTeamName(sportKey, name) {
+    const n = norm(name);
+    const al = (window.TEAM_ALIASES && window.TEAM_ALIASES[sportKey]) || {};
+    return al[n] || n;
+  }
 
-  
   const addDays = (d, n) => {
     const t = new Date(d);
     t.setDate(t.getDate() + n);
     return t;
   };
 
+  function getWindowEndMs(sportKey) {
+    return addDays(new Date(), WINDOW_DAYS[sportKey] || 5).getTime();
+  }
+
   function fmtDT(dt) {
-    // "Oct 2 • 7:10pm ET"
+    // "Oct 2 • 7:10pm ET" (local time display with static "ET" label kept to match your current UI)
     try {
       const d = new Date(dt);
       const optsD = { month: "short", day: "numeric" };
@@ -104,11 +110,10 @@ function canonTeamName(sportKey, name) {
 
     // Location label fallback = home "city part"
     const homeCity = evt.home_team.split(" ").slice(0, -1).join(" ") || evt.home_team;
-    const ts = new Date(evt.commence_time).getTime();
 
     return {
       id: evt.id,
-      ts,                                  // numeric timestamp for reliable sorting
+      ts: new Date(evt.commence_time).getTime(),
       time: fmtDT(evt.commence_time),
       location: homeCity,
       awayFull: evt.away_team,
@@ -144,7 +149,7 @@ function canonTeamName(sportKey, name) {
           <button id="filter-refresh" class="btn btn-refresh" type="button" title="Refresh odds">↻</button>
         </div>
       </div>
-    `;
+    ";
 
     // Options by sport
     const sel = document.getElementById("filter-league");
@@ -172,38 +177,38 @@ function canonTeamName(sportKey, name) {
   }
 
   // Robust division/conf matching using normalized maps from meta.js
-function matchDivisionConf(sportKey, filterValue, game) {
-  const val = norm(filterValue || "");
-  if (!val || val.startsWith("all")) return true;
+  function matchDivisionConf(sportKey, filterValue, game) {
+    const val = norm(filterValue || "");
+    if (!val || val.startsWith("all")) return true;
 
-  const nflMap = window.NFL_TEAM_TO_DIVISION;
-  const mlbMap = window.MLB_TEAM_TO_DIVISION;
-  const cfbMap = window.CFB_TEAM_TO_CONF;
+    const nflMap = window.NFL_TEAM_TO_DIVISION;
+    const mlbMap = window.MLB_TEAM_TO_DIVISION;
+    const cfbMap = window.CFB_TEAM_TO_CONF;
 
-  const away = canonTeamName(sportKey, game.awayFull);
-  const home = canonTeamName(sportKey, game.homeFull);
+    const away = canonTeamName(sportKey, game.awayFull);
+    const home = canonTeamName(sportKey, game.homeFull);
 
-  const teamMatches = (fullName) => {
-    if (sportKey === "mlb" && mlbMap) {
-      const div = norm(mlbMap[fullName] || "");
-      return !!div && div === val;
-    }
-    if (sportKey === "nfl" && nflMap) {
-      const div = norm(nflMap[fullName] || "");
-      return !!div && div === val;
-    }
-    if (sportKey === "sec" && cfbMap) {
-      const conf = norm(cfbMap[fullName] || "");
-      if (!conf) return false;
-      if (val === "notre dame") return conf === "notre dame";
-      return conf === val;
-    }
-    return true; // fail-open if map missing
-  };
+    const teamMatches = (fullName) => {
+      if (sportKey === "mlb" && mlbMap) {
+        const div = norm(mlbMap[fullName] || "");
+        return !!div && div === val;
+      }
+      if (sportKey === "nfl" && nflMap) {
+        const div = norm(nflMap[fullName] || "");
+        return !!div && div === val;
+      }
+      if (sportKey === "sec" && cfbMap) {
+        const conf = norm(cfbMap[fullName] || "");
+        if (!conf) return false;
+        if (val === "notre dame") return conf === "notre dame";
+        return conf === val;
+      }
+      return true; // fail-open if map missing
+    };
 
-  return teamMatches(away) || teamMatches(home);
-}
-
+    // Keep the game if either team matches the selected bucket
+    return teamMatches(away) || teamMatches(home);
+  }
 
   // ---- Public API ----
   async function getOddsFor(sportKey) {
@@ -211,13 +216,14 @@ function matchDivisionConf(sportKey, filterValue, game) {
     if (!sportApi) throw new Error(`Unknown sport key: ${sportKey}`);
     if (!KEY) throw new Error("Missing API key (window.ODDS_API_KEY)");
 
+    const nowMs = Date.now();
+
     // cache hit?
     const hit = _CACHE[sportKey];
-    const nowMs = Date.now();
     if (hit && hit.expires > nowMs) {
-      const cachedGames = mapAndFilter(hit.raw, sportKey);
-      wireFiltersAndRender(sportKey, cachedGames);
-      return cachedGames;
+      const cachedGames = mapAndSort(hit.raw, sportKey);
+      const initial = wireFiltersAndRender(sportKey, cachedGames);
+      return initial;
     }
 
     const end = addDays(new Date(), WINDOW_DAYS[sportKey] || 5);
@@ -244,35 +250,52 @@ function matchDivisionConf(sportKey, filterValue, game) {
       expires: nowMs + chooseTTLMillis(upcoming)
     };
 
-    const games = mapAndFilter(upcoming, sportKey);
-    wireFiltersAndRender(sportKey, games);
-    return games;
+    const games = mapAndSort(upcoming, sportKey);
+    const initial = wireFiltersAndRender(sportKey, games);
+    return initial;
   }
 
-  // Map, sort, and return list shaped for rendering
-  function mapAndFilter(events, sportKey) {
+  // Map + sort helper
+  function mapAndSort(events, sportKey) {
     const games = (events || []).map(e => mapEventToGame(e, sportKey));
     games.sort((a, b) => a.ts - b.ts);
     return games;
   }
 
-  // Build filters, attach handlers, and render initial list
-  function wireFiltersAndRender(sportKey, games) {
+  // Build filters, attach handlers, and render with time-based hiding
+  function wireFiltersAndRender(sportKey, allGames) {
     buildFiltersUI(sportKey);
 
-    const sel = document.getElementById("filter-league");
-    const search = document.getElementById("filter-search");
+    const sel     = document.getElementById("filter-league");
+    const search  = document.getElementById("filter-search");
     const refresh = document.getElementById("filter-refresh");
 
-    function applyFilters() {
+    const endMs = getWindowEndMs(sportKey);
+
+    function computeFiltered() {
       const q = (search?.value || "").trim().toLowerCase();
       const bucket = sel?.value || "";
-      const filtered = games.filter(g => {
-        const hitsText = !q || (g.awayFull.toLowerCase().includes(q) || g.homeFull.toLowerCase().includes(q));
-        const hitsBucket = matchDivisionConf(sportKey, bucket, g);
-        return hitsText && hitsBucket;
-      });
-      window.reRenderOdds && window.reRenderOdds(filtered);
+      const nowMs = Date.now();
+
+      const filtered = allGames
+        // within lookahead window
+        .filter(g => g.ts <= endMs)
+        // remove games >= 10 minutes after kickoff
+        .filter(g => nowMs <= (g.ts + POST_KICK_HIDE_MS))
+        // search text + division/conf bucket
+        .filter(g => {
+          const hitsText = !q || g.awayFull.toLowerCase().includes(q) || g.homeFull.toLowerCase().includes(q);
+          const hitsBucket = matchDivisionConf(sportKey, bucket, g);
+          return hitsText && hitsBucket;
+        })
+        .sort((a, b) => a.ts - b.ts);
+
+      return filtered;
+    }
+
+    function applyFilters() {
+      const list = computeFiltered();
+      window.reRenderOdds && window.reRenderOdds(list);
     }
 
     sel && sel.addEventListener("change", applyFilters);
@@ -286,10 +309,17 @@ function matchDivisionConf(sportKey, filterValue, game) {
     refresh && refresh.addEventListener("click", () => location.reload());
 
     // Initial render
-    window.reRenderOdds && window.reRenderOdds(games);
+    const initial = computeFiltered();
+    window.reRenderOdds && window.reRenderOdds(initial);
+
+    // Re-check every 60s so games drop off 10 min after kickoff automatically
+    if (!window.__kickoffHideTimer) {
+      window.__kickoffHideTimer = setInterval(applyFilters, 60_000);
+    }
+
+    return initial;
   }
 
   // Expose
   window.OddsService = { getOddsFor };
 })();
-
