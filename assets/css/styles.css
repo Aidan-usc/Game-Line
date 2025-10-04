@@ -681,111 +681,37 @@ body {
 /* Responsive */
 @media (max-width: 820px) {
   .filter-bar-inner {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
-  }
-  .filter-right { margin-left: 0; }
-  .filter-search { min-width: 0; width: 100%; }
-}
-/* =========================
-   RIGHT RAIL — refreshed
+    flex-d
+      /* =========================
+   RIGHT RAIL — refined
    ========================= */
 .parlay-rail{
-  position: fixed;
-  top: 110px;
-  right: 18px;
-  bottom: 18px;
-  width: 340px;
-  display:flex;
-  flex-direction:column;
+  position: fixed; top:110px; right:18px; bottom:18px; width:360px;
+  display:flex; flex-direction:column;
   background: linear-gradient(180deg,#ffffff, #fbf7ff);
   border: 2px solid rgba(59,30,118,.20);
   border-radius: 18px;
   box-shadow: 0 10px 30px rgba(20,1,22,.10), 0 6px 14px rgba(20,1,22,.08);
-  overflow: hidden;
+  overflow:hidden;
 }
-
-/* Header */
 .rail-header{
-  position: sticky; top:0; z-index:2;
+  position:sticky; top:0; z-index:2;
   background: linear-gradient(180deg, rgba(251,247,255,0.96), rgba(251,247,255,0.86));
   backdrop-filter: blur(6px);
   border-bottom: 1px dashed rgba(59,30,118,.25);
-  padding: 14px 14px 10px;
+  padding: 14px 14px 12px;
 }
 .rail-title-row{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
-.rail-title{
-  font-family: var(--font-nav);
-  font-size: 28px;
-  letter-spacing: .02em;
-  color: var(--indigo);
-  margin:0;
-}
+.rail-title{ font-family:var(--font-nav); font-size:28px; color:var(--indigo); margin:0; }
 .rail-clear{
-  border:0; background: transparent; color: #7a6db7; font-weight:700;
-  padding:6px 10px; border-radius: 10px; cursor:pointer;
+  width:34px; height:34px; line-height:34px; text-align:center;
+  border:0; border-radius:10px; font-size:22px; font-weight:900;
+  background:transparent; color:#7a6db7; cursor:pointer;
 }
-.rail-clear:hover{ background: rgba(59,30,118,.08); color: var(--carmine); }
+.rail-clear:hover{ background: rgba(59,30,118,.07); color:#c0392b; }
 
-/* Body (scroll area for legs) */
-.rail-body{ padding: 10px 12px 0; flex:1; overflow:auto; }
+.rail-body{ padding:10px 12px 140px; flex:1; overflow:auto; } /* bottom pad so legs never overlap footer */
 
-/* Leg card */
-.legs{ list-style:none; padding:0; margin:0; }
-.leg-card{
-  display:grid;
-  grid-template-columns: 48px 1fr auto;
-  gap: 10px;
-  align-items:center;
-  background: #fbfaff;
-  border: 1px solid #ebe6ff;
-  border-radius: 14px;
-  padding: 10px 12px;
-  margin-bottom: 10px;
-  box-shadow: 0 6px 16px rgba(59,30,118,.06);
-  transition: transform .08s ease, box-shadow .15s ease, border-color .15s ease;
-}
-.leg-card:hover{
-  transform: translateY(-1px);
-  border-color: rgba(59,30,118,.35);
-  box-shadow: 0 10px 24px rgba(59,30,118,.12);
-}
-
-/* logo square */
-.leg-logo{
-  width: 48px; height: 48px; display:grid; place-items:center;
-  background:white; border:1px solid #eee; border-radius:10px;
-}
-.leg-logo img{ width:40px; height:40px; object-fit:contain; }
-
-/* names block: keep your 5-line structure but tighten it */
-.leg-names{ line-height:1.05; }
-.leg-names .name-city{ font-size:13px; opacity:.85; }
-.leg-names .name-mascot{ font-size:16px; font-weight:800; color: var(--deep); }
-.leg-names .name-at{
-  font-family: var(--font-nav);
-  font-size:18px; color: #7a6db7; margin:4px 0; text-align:center;
-}
-
-/* right meta column */
-.leg-meta{ display:flex; flex-direction:column; align-items:flex-end; gap:6px; }
-.odds-pill{
-  display:inline-block; padding:4px 10px;
-  background: var(--indigo); color: var(--maize);
-  border-radius: 999px; font-family: var(--font-nav); font-weight:800;
-}
-.market-badge{
-  font-size:11px; padding:2px 8px; border-radius:999px;
-  background: rgba(59,30,118,.08); color: #5a4aa8; font-weight:700;
-}
-.remove{
-  cursor:pointer; width:26px; height:26px; display:grid; place-items:center;
-  border-radius:50%; color:#8b7fd1;
-}
-.remove:hover{ background: rgba(59,30,118,.10); color: var(--indigo); }
-
-/* Footer (pinned summary) */
 .rail-footer{
   padding: 10px 12px 14px;
   background: radial-gradient(120% 80% at 50% 0%, rgba(20,1,22,.04), rgba(20,1,22,0));
@@ -793,20 +719,63 @@ body {
 }
 .rail-summary{ display:grid; gap:10px; }
 .rail-summary .row{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
-#wager{
-  width: 140px; padding: 10px 12px; border-radius: 12px;
-  border:1px solid #e1dbff; font-size:16px; background:#fff;
-}
+#wager{ width:140px; padding:10px 12px; border-radius:12px; border:1px solid #e1dbff; background:#fff; font-size:16px; }
 .btn-block{ width:100%; }
 .btn-primary{
   background: var(--indigo); color: var(--maize); border:2px solid var(--maize);
   border-radius: 16px; padding: 14px 16px; font-family: var(--font-nav); font-size:18px;
 }
 .btn-primary:disabled{ opacity:.55; cursor:not-allowed; }
-.btn-primary:hover:not(:disabled){ filter: brightness(1.02); transform: translateY(-1px); }
+.btn-primary:hover:not(:disabled){ transform: translateY(-1px); }
 
-/* Mobile fallbacks */
-@media (max-width: 1100px){
-  .parlay-rail{ position:static; width:auto; height:auto; right:auto; bottom:auto; }
+/* Leg list */
+.legs{ list-style:none; padding:0; margin:0; }
+.leg-card{
+  position:relative;
+  display:grid; grid-template-columns: 56px 1fr auto; gap:12px; align-items:center;
+  background:#fbfaff; border:1px solid #ebe6ff; border-radius:14px; padding:12px 12px;
+  margin-bottom:10px; box-shadow:0 6px 16px rgba(59,30,118,.06);
+  transition: transform .08s ease, box-shadow .15s ease, border-color .15s ease;
+}
+.leg-card:hover{ transform:translateY(-1px); border-color:rgba(59,30,118,.35); box-shadow:0 10px 24px rgba(59,30,118,.12); }
+
+.leg-x{ position:absolute; top:6px; right:6px; width:26px; height:26px; line-height:26px; text-align:center;
+  border:0; border-radius:50%; background:transparent; color:#8b7fd1; font-weight:900; cursor:pointer; }
+.leg-x:hover{ background:rgba(59,30,118,.10); color:#c0392b; }
+
+/* Logo block */
+.leg-logo{ width:56px; height:56px; display:grid; place-items:center; background:#fff; border:1px solid #eee; border-radius:12px; overflow:hidden; }
+.leg-logo img{ width:48px; height:48px; object-fit:contain; }
+
+/* Diagonal split for totals */
+.diagonal-logos{ position:relative; }
+.diagonal-logos img{ position:absolute; width:100%; height:100%; object-fit:contain; }
+.diagonal-logos .away{ clip-path: polygon(0 0, 100% 0, 0 100%); }     /* top-left triangle */
+.diagonal-logos .home{ clip-path: polygon(100% 0, 100% 100%, 0 100%); } /* bottom-right triangle */
+.diagonal-logos::after{ content:""; position:absolute; inset:0; background: repeating-linear-gradient(135deg, transparent 0 6px, rgba(59,30,118,.08) 6px 7px); pointer-events:none; }
+
+/* Names block */
+.leg-names{ line-height:1.05; }
+.leg-names .name-city{ font-size:13px; opacity:.85; }
+.leg-names .name-mascot{ font-size:18px; font-weight:900; color: var(--deep); }
+.leg-names .name-at{ font-family:var(--font-nav); font-size:18px; color:#7a6db7; margin:4px 0; text-align:center; }
+
+/* Right meta: label above odds */
+.leg-meta{ display:flex; flex-direction:column; align-items:flex-end; gap:6px; min-width:88px; }
+.market-top{ font-size:12px; font-weight:800; letter-spacing:.02em; color:#5a4aa8; background:rgba(59,30,118,.08); padding:2px 8px; border-radius:999px; }
+.odds-text{
+  min-width:72px; text-align:center; padding:6px 10px; border-radius:10px;
+  border:1px solid #e1dbff; background:#fff; font-family:var(--font-nav); font-size:18px; font-weight:800;
 }
 
+/* Mobile */
+@media (max-width:1100px){
+  .parlay-rail{ position:static; width:auto; right:auto; bottom:auto; }
+}
+irection: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .filter-right { margin-left: 0; }
+  .filter-search { min-width: 0; width: 100%; }
+}
