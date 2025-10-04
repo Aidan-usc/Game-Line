@@ -11,14 +11,10 @@ const POST_KICK_HIDE_MS  = POST_KICK_HIDE_MIN * 60 * 1000;
   const MARKETS = "h2h,totals";
   const ODDS_FMT = "american";
 
-  // Windows (lookahead, in days)
-  const WINDOW_DAYS = {
-    mlb: 5,
-    nfl: 9,
-    sec: 9, // sec == CFB
-  };
+  // Lookahead window (days)
+  const WINDOW_DAYS = { mlb: 5, nfl: 9, sec: 9 };
 
-  // Page key -> Odds API sport key
+  // Page key -> Odds API key
   const SPORT_TO_API = {
     mlb: "baseball_mlb",
     nfl: "americanfootball_nfl",
@@ -29,7 +25,9 @@ const POST_KICK_HIDE_MS  = POST_KICK_HIDE_MIN * 60 * 1000;
   const BOOKS = ["draftkings", "fanduel", "betmgm", "caesars", "pointsbetus", "barstool"];
 
   // ---- Helpers ----
-  const norm = (window.__NAME_NORM__) || (s => String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim());
+  const norm =
+    (window.__NAME_NORM__) ||
+    (s => String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim());
 
   function canonTeamName(sportKey, name) {
     const n = norm(name);
@@ -43,12 +41,7 @@ const POST_KICK_HIDE_MS  = POST_KICK_HIDE_MIN * 60 * 1000;
     return t;
   };
 
-  function getWindowEndMs(sportKey) {
-    return addDays(new Date(), WINDOW_DAYS[sportKey] || 5).getTime();
-  }
-
   function fmtDT(dt) {
-    // "Oct 2 • 7:10pm ET" (local time display with static "ET" label kept to match your current UI)
     try {
       const d = new Date(dt);
       const optsD = { month: "short", day: "numeric" };
@@ -77,12 +70,12 @@ const POST_KICK_HIDE_MS  = POST_KICK_HIDE_MIN * 60 * 1000;
 
   function chooseBook(bookmakers) {
     const byKey = {};
-    for (const b of bookmakers || []) byKey[b.key] = b;
+    for (const b of (bookmakers || [])) byKey[b.key] = b;
     for (const pref of BOOKS) if (byKey[pref]) return byKey[pref];
     return bookmakers?.[0];
   }
 
-  // Build game rows that parlay.js expects
+  // Map an API event to your card model
   function mapEventToGame(evt, sportKey) {
     const apiBook = chooseBook(evt.bookmakers || []);
     const markets = apiBook?.markets || [];
@@ -108,7 +101,6 @@ const POST_KICK_HIDE_MS  = POST_KICK_HIDE_MIN * 60 * 1000;
       under = underO?.price ?? null;
     }
 
-    // Location label fallback = home "city part"
     const homeCity = evt.home_team.split(" ").slice(0, -1).join(" ") || evt.home_team;
 
     return {
@@ -149,9 +141,9 @@ const POST_KICK_HIDE_MS  = POST_KICK_HIDE_MIN * 60 * 1000;
           <button id="filter-refresh" class="btn btn-refresh" type="button" title="Refresh odds">↻</button>
         </div>
       </div>
-    ";
+    `;
 
-    // Options by sport
+    // options by sport
     const sel = document.getElementById("filter-league");
     const opts =
       sportKey === "mlb" ? [
@@ -168,7 +160,6 @@ const POST_KICK_HIDE_MS  = POST_KICK_HIDE_MIN * 60 * 1000;
         "All (Power 4 + ND)",
         "SEC","Big Ten","Big 12","ACC","Notre Dame"
       ];
-
     for (const o of opts) {
       const el = document.createElement("option");
       el.value = o; el.textContent = o;
@@ -176,7 +167,7 @@ const POST_KICK_HIDE_MS  = POST_KICK_HIDE_MIN * 60 * 1000;
     }
   }
 
-  // Robust division/conf matching using normalized maps from meta.js
+  // Division/conf matching with maps from meta.js
   function matchDivisionConf(sportKey, filterValue, game) {
     const val = norm(filterValue || "");
     if (!val || val.startsWith("all")) return true;
@@ -206,7 +197,6 @@ const POST_KICK_HIDE_MS  = POST_KICK_HIDE_MIN * 60 * 1000;
       return true; // fail-open if map missing
     };
 
-    // Keep the game if either team matches the selected bucket
     return teamMatches(away) || teamMatches(home);
   }
 
@@ -222,8 +212,7 @@ const POST_KICK_HIDE_MS  = POST_KICK_HIDE_MIN * 60 * 1000;
     const hit = _CACHE[sportKey];
     if (hit && hit.expires > nowMs) {
       const cachedGames = mapAndSort(hit.raw, sportKey);
-      const initial = wireFiltersAndRender(sportKey, cachedGames);
-      return initial;
+      return wireFiltersAndRender(sportKey, cachedGames);
     }
 
     const end = addDays(new Date(), WINDOW_DAYS[sportKey] || 5);
@@ -241,18 +230,17 @@ const POST_KICK_HIDE_MS  = POST_KICK_HIDE_MIN * 60 * 1000;
     }
     const json = await res.json();
 
-    // keep only events within our window to the client
+    // Keep only events within lookahead window (upper bound only)
     const upcoming = (json || []).filter(e => new Date(e.commence_time) <= end);
 
-    // set cache
+    // cache raw
     _CACHE[sportKey] = {
       raw: upcoming,
       expires: nowMs + chooseTTLMillis(upcoming)
     };
 
     const games = mapAndSort(upcoming, sportKey);
-    const initial = wireFiltersAndRender(sportKey, games);
-    return initial;
+    return wireFiltersAndRender(sportKey, games);
   }
 
   // Map + sort helper
@@ -262,7 +250,7 @@ const POST_KICK_HIDE_MS  = POST_KICK_HIDE_MIN * 60 * 1000;
     return games;
   }
 
-  // Build filters, attach handlers, and render with time-based hiding
+  // Build filters, attach handlers, and render with post-kick hiding
   function wireFiltersAndRender(sportKey, allGames) {
     buildFiltersUI(sportKey);
 
@@ -270,19 +258,15 @@ const POST_KICK_HIDE_MS  = POST_KICK_HIDE_MIN * 60 * 1000;
     const search  = document.getElementById("filter-search");
     const refresh = document.getElementById("filter-refresh");
 
-    const endMs = getWindowEndMs(sportKey);
-
     function computeFiltered() {
       const q = (search?.value || "").trim().toLowerCase();
       const bucket = sel?.value || "";
       const nowMs = Date.now();
 
       const filtered = allGames
-        // within lookahead window
-        .filter(g => g.ts <= endMs)
-        // remove games >= 10 minutes after kickoff
+        // hide games >= 10 minutes after kickoff
         .filter(g => nowMs <= (g.ts + POST_KICK_HIDE_MS))
-        // search text + division/conf bucket
+        // text + division/conf bucket
         .filter(g => {
           const hitsText = !q || g.awayFull.toLowerCase().includes(q) || g.homeFull.toLowerCase().includes(q);
           const hitsBucket = matchDivisionConf(sportKey, bucket, g);
@@ -294,8 +278,7 @@ const POST_KICK_HIDE_MS  = POST_KICK_HIDE_MIN * 60 * 1000;
     }
 
     function applyFilters() {
-      const list = computeFiltered();
-      window.reRenderOdds && window.reRenderOdds(list);
+      window.reRenderOdds && window.reRenderOdds(computeFiltered());
     }
 
     sel && sel.addEventListener("change", applyFilters);
