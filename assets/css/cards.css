@@ -106,13 +106,13 @@
   color:var(--deep);
   border-color:var(--maize);
 }
-.pick-btn.selected{
-  background:var(--indigo);                       /* selected stays indigo */
-  color:var(--maize);
-  border-color:var(--indigo);
-}
-.pick-btn.selected:hover{
-  background:var(--indigo); color:var(--maize); border-color:var(--indigo);
+
+/* NEW: disabled (no odds available) */
+.pick-btn.disabled,
+.pick-btn:disabled {
+  opacity:.55;
+  cursor:not-allowed;
+  pointer-events:none;
 }
 
 /* Align the @ with the first line of team text */
