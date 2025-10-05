@@ -109,27 +109,63 @@ const POST_KICK_HIDE_MS  = POST_KICK_HIDE_MIN * 60 * 1000;
     } catch {}
   }
 
-  // ======== Power-4 + Notre Dame restriction for CFB ========
-  // Uses your window.CFB_TEAM_TO_CONF map (normalized values like 'sec', 'big ten', 'big 12', 'acc', 'independent', etc).
-  // Fails open (returns true) if the map is missing so we don't break the page during dev.
+  // ======== Robust Power-4 + Notre Dame restriction for CFB ========
+  function getCFBConf(teamName) {
+    const map = window.CFB_TEAM_TO_CONF || {};
+    const n = norm(teamName);
+
+    // direct lookup by normalized team name
+    if (map[n]) return String(map[n]).toLowerCase();
+
+    // try TEAM_ALIASES.sec (API -> canonical)
+    const aliasMap = window.TEAM_ALIASES?.sec || {};
+    const aliasKey = aliasMap[n];
+    if (aliasKey && map[aliasKey]) return String(map[aliasKey]).toLowerCase();
+
+    // fuzzy: normalized equality over keys
+    for (const k in map) {
+      const nk = norm(k);
+      if (nk === n) return String(map[k]).toLowerCase();
+    }
+    // fuzzy: includes either way
+    for (const k in map) {
+      const nk = norm(k);
+      if (n.includes(nk) || nk.includes(n)) return String(map[k]).toLowerCase();
+    }
+
+    // fuzzy: strip common words and retry
+    const slim = n.replace(/\b(state|university|univ|the)\b/g, "").replace(/\s+/g, " ").trim();
+    if (slim && slim !== n) {
+      for (const k in map) {
+        const nk = norm(k);
+        if (nk === slim || slim.includes(nk) || nk.includes(slim)) return String(map[k]).toLowerCase();
+      }
+    }
+    return ""; // unknown
+  }
+
   function isPower4MatchCFB(evt) {
     const confMap = window.CFB_TEAM_TO_CONF;
-    if (!confMap) return true; // fail open if map not loaded
+    if (!confMap) return true; // fail-open during dev
 
-    const awayKey = canonTeamName("sec", evt.away_team);
-    const homeKey = canonTeamName("sec", evt.home_team);
-    const cAway = norm(confMap[awayKey] || "");
-    const cHome = norm(confMap[homeKey] || "");
+    const awayNameN = norm(evt.away_team);
+    const homeNameN = norm(evt.home_team);
+    const awayConf  = getCFBConf(evt.away_team);
+    const homeConf  = getCFBConf(evt.home_team);
 
-    const isPower4Conf = (c, teamNameNorm) =>
-      c === "sec" || c === "big ten" || c === "big 12" || c === "acc" ||
-      (c === "independent" && teamNameNorm === "notre dame");
+    const isP4 = c => c === "sec" || c === "big ten" || c === "big 12" || c === "acc";
+    const isND = n => n === "notre dame";
 
-    const awayIsND = norm(awayKey) === "notre dame";
-    const homeIsND = norm(homeKey) === "notre dame";
+    return isP4(awayConf) || isP4(homeConf) || isND(awayNameN) || isND(homeNameN);
+  }
 
-    return isPower4Conf(cAway, awayIsND ? "notre dame" : "") ||
-           isPower4Conf(cHome, homeIsND ? "notre dame" : "");
+  function filterCFBWithSafety(list) {
+    const filtered = (list || []).filter(isPower4MatchCFB);
+    if (filtered.length === 0 && (list || []).length > 0) {
+      console.warn("[CFB] Power-4 filter returned 0 games — showing all until mapping is aligned.");
+      return list;
+    }
+    return filtered;
   }
 
   // ======== Market & mapping helpers ========
@@ -220,13 +256,14 @@ const POST_KICK_HIDE_MS  = POST_KICK_HIDE_MIN * 60 * 1000;
     `;
 
     const sel = document.getElementById("filter-league");
+    const sport = canonSportKey(sportKey);
     const opts =
-      canonSportKey(sportKey) === "mlb" ? [
+      sport === "mlb" ? [
         "All",
         "AL East","AL Central","AL West",
         "NL East","NL Central","NL West"
       ] :
-      canonSportKey(sportKey) === "nfl" ? [
+      sport === "nfl" ? [
         "All",
         "AFC East","AFC North","AFC South","AFC West",
         "NFC East","NFC North","NFC South","NFC West"
@@ -254,16 +291,17 @@ const POST_KICK_HIDE_MS  = POST_KICK_HIDE_MIN * 60 * 1000;
     const away = canonTeamName(sportKey, game.awayFull);
     const home = canonTeamName(sportKey, game.homeFull);
 
+    const sport = canonSportKey(sportKey);
     const teamMatches = (fullName) => {
-      if (canonSportKey(sportKey) === "mlb" && mlbMap) {
+      if (sport === "mlb" && mlbMap) {
         const div = norm(mlbMap[fullName] || "");
         return !!div && div === val;
       }
-      if (canonSportKey(sportKey) === "nfl" && nflMap) {
+      if (sport === "nfl" && nflMap) {
         const div = norm(nflMap[fullName] || "");
         return !!div && div === val;
       }
-      if (isCFB(sportKey) && cfbMap) {
+      if (sport === "sec" && cfbMap) {
         const conf = norm(cfbMap[fullName] || "");
         if (!conf) return false;
         if (val === "notre dame") return conf === "independent"; // ND special
@@ -287,7 +325,7 @@ const POST_KICK_HIDE_MS  = POST_KICK_HIDE_MIN * 60 * 1000;
     if (DAILY_CACHE) {
       const lsRaw = _readDaily(sk);
       if (lsRaw) {
-        const raw = isCFB(sk) ? lsRaw.filter(isPower4MatchCFB) : lsRaw;
+        const raw = isCFB(sk) ? filterCFBWithSafety(lsRaw) : lsRaw;
         const games = mapAndSort(raw, sk).filter(hidePostKick);
         return wireFiltersAndRender(sk, games);
       }
@@ -298,7 +336,7 @@ const POST_KICK_HIDE_MS  = POST_KICK_HIDE_MIN * 60 * 1000;
     const hit = _CACHE[sk];
     if (hit && hit.expires > nowMs) {
       let raw = hit.raw;
-      if (isCFB(sk)) raw = raw.filter(isPower4MatchCFB);
+      if (isCFB(sk)) raw = filterCFBWithSafety(raw);
       const cachedGames = mapAndSort(raw, sk).filter(hidePostKick);
       return wireFiltersAndRender(sk, cachedGames);
     }
@@ -319,8 +357,8 @@ const POST_KICK_HIDE_MS  = POST_KICK_HIDE_MIN * 60 * 1000;
     }
     let upcoming = (await res.json() || []).filter(e => new Date(e.commence_time) <= end);
 
-    // Restrict CFB to Power-4 + Notre Dame
-    if (isCFB(sk)) upcoming = upcoming.filter(isPower4MatchCFB);
+    // Restrict CFB to Power-4 + Notre Dame (with safety fallback)
+    if (isCFB(sk)) upcoming = filterCFBWithSafety(upcoming);
 
     // Write daily cache for the day
     if (DAILY_CACHE) {
