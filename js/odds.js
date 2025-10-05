@@ -76,46 +76,45 @@ const POST_KICK_HIDE_MS  = POST_KICK_HIDE_MIN * 60 * 1000;
   }
 
   // Map an API event to your card model
-  function mapEventToGame(evt, sportKey) {
-    const apiBook = chooseBook(evt.bookmakers || []);
-    const markets = apiBook?.markets || [];
-    const h2h = markets.find(m => m.key === "h2h");
-    const totals = markets.find(m => m.key === "totals");
+function mapEventToGame(evt, sportKey) {
+  const h2h    = pickMarket(evt.bookmakers, "h2h");
+  const totals = pickMarket(evt.bookmakers, "totals");
 
-    // Moneyline
-    let mlAway = null, mlHome = null;
-    if (h2h?.outcomes?.length) {
-      const oAway = h2h.outcomes.find(o => o.name === evt.away_team);
-      const oHome = h2h.outcomes.find(o => o.name === evt.home_team);
-      mlAway = oAway?.price ?? null;
-      mlHome = oHome?.price ?? null;
-    }
-
-    // Totals
-    let total = null, over = null, under = null;
-    if (totals?.outcomes?.length) {
-      const overO = totals.outcomes.find(o => norm(o.name) === "over");
-      const underO = totals.outcomes.find(o => norm(o.name) === "under");
-      total = overO?.point ?? underO?.point ?? null;
-      over = overO?.price ?? null;
-      under = underO?.price ?? null;
-    }
-
-    const homeCity = evt.home_team.split(" ").slice(0, -1).join(" ") || evt.home_team;
-
-    return {
-      id: evt.id,
-      ts: new Date(evt.commence_time).getTime(),
-      time: fmtDT(evt.commence_time),
-      location: homeCity,
-      awayFull: evt.away_team,
-      homeFull: evt.home_team,
-      awayLogo: window.LogoFinder?.get(evt.away_team, sportKey),
-      homeLogo: window.LogoFinder?.get(evt.home_team, sportKey),
-      mlAway, mlHome,
-      total, over, under
-    };
+  // Moneyline
+  let mlAway = null, mlHome = null;
+  if (h2h?.outcomes?.length) {
+    const oAway = h2h.outcomes.find(o => eqName(o.name, evt.away_team));
+    const oHome = h2h.outcomes.find(o => eqName(o.name, evt.home_team));
+    mlAway = Number.isFinite(+oAway?.price) ? oAway.price : null;
+    mlHome = Number.isFinite(+oHome?.price) ? oHome.price : null;
   }
+
+  // Totals
+  let total = null, over = null, under = null;
+  if (totals?.outcomes?.length) {
+    const overO  = totals.outcomes.find(o => String(o.name).toLowerCase() === "over");
+    const underO = totals.outcomes.find(o => String(o.name).toLowerCase() === "under");
+    const line   = Number.isFinite(+overO?.point) ? +overO.point : (Number.isFinite(+underO?.point) ? +underO.point : null);
+    total = line;
+    over  = Number.isFinite(+overO?.price)  ? overO.price  : null;
+    under = Number.isFinite(+underO?.price) ? underO.price : null;
+  }
+
+  const homeCity = evt.home_team.split(" ").slice(0, -1).join(" ") || evt.home_team;
+
+  return {
+    id: evt.id,
+    ts: new Date(evt.commence_time).getTime(),
+    time: fmtDT(evt.commence_time),
+    location: homeCity,
+    awayFull: evt.away_team,
+    homeFull: evt.home_team,
+    awayLogo: window.LogoFinder?.get(evt.away_team, sportKey),
+    homeLogo: window.LogoFinder?.get(evt.home_team, sportKey),
+    mlAway, mlHome,
+    total, over, under
+  };
+}
 
   // ---- Filters UI ----
   function buildFiltersUI(sportKey) {
@@ -250,6 +249,30 @@ const POST_KICK_HIDE_MS  = POST_KICK_HIDE_MIN * 60 * 1000;
     return games;
   }
 
+  // Pick a market (h2h or totals) from our priority list; fall back to any that has 2+ outcomes
+function pickMarket(bookmakers, key) {
+  const list = bookmakers || [];
+  const byPriority = BOOKS
+    .map(k => list.find(b => b.key === k))
+    .filter(Boolean);
+
+  // First, try by our priority
+  for (const b of byPriority) {
+    const m = (b.markets || []).find(x => x.key === key);
+    if (m?.outcomes?.length >= 2) return m;
+  }
+  // Fallback: any book that has both sides
+  for (const b of list) {
+    const m = (b.markets || []).find(x => x.key === key);
+    if (m?.outcomes?.length >= 2) return m;
+  }
+  return null;
+}
+
+const eqName = (a,b) => (window.__NAME_NORM__||((s)=>String(s||"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim()))(a) ===
+                        (window.__NAME_NORM__||((s)=>String(s||"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim()))(b);
+
+
   // Build filters, attach handlers, and render with post-kick hiding
   function wireFiltersAndRender(sportKey, allGames) {
     buildFiltersUI(sportKey);
@@ -306,3 +329,4 @@ const POST_KICK_HIDE_MS  = POST_KICK_HIDE_MIN * 60 * 1000;
   // Expose
   window.OddsService = { getOddsFor };
 })();
+
