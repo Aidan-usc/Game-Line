@@ -197,10 +197,14 @@ body {
   padding:14px 14px 12px;
 }
 .rail-title{
-  font-family:var(--font-nav); font-size:28px; color:var(--indigo);
+  padding-left:30px;
+  font-family:var(--font-nav); 
+  font-size:28px; 
+  color:var(--indigo);
   margin:0; line-height:1;
 }
 .rail-clear{
+  padding-left:30px;
   width:34px; height:34px; line-height:34px; text-align:center;
   border:0; border-radius:10px; font-size:22px; font-weight:900;
   background:transparent; color:#7a6db7; cursor:pointer;
@@ -494,5 +498,6 @@ body {
 /* HOME responsive tweaks */
 @media (max-width: 1024px) { .card-grid.three { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 680px)  { .card-grid.three { grid-template-columns: 1fr; } }
+
 
 
