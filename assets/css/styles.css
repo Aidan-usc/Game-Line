@@ -338,7 +338,7 @@ body {
 .hero {
   position: relative;
   overflow: hidden;
-  border-radius: 0 0 var(--radius) var(--radius);
+  border-radius:15px;
   box-shadow: var(--shadow);
   min-height: 60vh;
 }
@@ -494,4 +494,5 @@ body {
 /* HOME responsive tweaks */
 @media (max-width: 1024px) { .card-grid.three { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 680px)  { .card-grid.three { grid-template-columns: 1fr; } }
+
 
