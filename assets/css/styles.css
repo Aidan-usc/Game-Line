@@ -190,7 +190,6 @@ body {
   height:50px;
   position: relative;
   display: block;                  /* break out of flex */
-  padding: 12px 14px;
   border-bottom: 1px dashed #eae6ff;
 }
 
@@ -201,7 +200,7 @@ body {
   transform: translate(-50%, -50%);
   margin:0;
   font-family: var(--font-nav);
-  font-size:  26px;
+  font-size:  23px;
   color: var(--indigo);
 }
 
@@ -501,6 +500,7 @@ body {
 /* HOME responsive tweaks */
 @media (max-width: 1024px) { .card-grid.three { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 680px)  { .card-grid.three { grid-template-columns: 1fr; } }
+
 
 
 
