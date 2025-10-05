@@ -1,103 +1,74 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <title>Sign in • Phantom Picks</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link href="css/styles.css" rel="stylesheet" />
-</head>
-<body>
-  <!-- If your site uses a shared header include, keep it here -->
-  <!-- ... site-header ... -->
+<body class="page-content no-rail">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-tabs" role="tablist" aria-label="Auth tabs">
+        <button class="auth-tab is-active" data-tab="signin" aria-selected="true">Sign in</button>
+        <button class="auth-tab" data-tab="signup" aria-selected="false">Create account</button>
+      </div>
 
-  <main class="page-content no-rail">
-    <div class="auth-wrap">
-      <div class="auth-card" id="authCard">
-        <div class="auth-tabs">
-          <button class="auth-tab active" data-tab="login" id="tabLogin">Sign in</button>
-          <button class="auth-tab" data-tab="signup" id="tabSignup">Create account</button>
-        </div>
+      <div class="auth-body">
+        <!-- Sign in -->
+        <form class="auth-form" id="form-signin" autocomplete="on">
+          <h1 class="auth-title">Welcome back</h1>
+          <p class="auth-sub">Sign in to stack picks and compete on the leaderboard.</p>
 
-        <!-- Error box (hidden by default) -->
-        <div id="authError" class="auth-error" role="alert"></div>
+          <label class="field">
+            <span class="field-label">Email</span>
+            <input class="field-input" type="email" placeholder="you@example.com" required>
+          </label>
 
-        <div class="auth-body">
-          <!-- LOGIN PANEL -->
-          <section id="panelLogin" class="auth-panel" aria-labelledby="tabLogin">
-            <h1 class="auth-title">Welcome back</h1>
-            <p class="auth-sub">Sign in to stack picks and compete on the leaderboard.</p>
+          <label class="field">
+            <span class="field-label">Password</span>
+            <input class="field-input" type="password" placeholder="••••••••" required>
+          </label>
 
-            <form id="formLogin" novalidate>
-              <div class="auth-grid full">
-                <div class="auth-field">
-                  <label for="loginEmail">Email</label>
-                  <input id="loginEmail" class="auth-input" type="email" name="email" autocomplete="email" required />
-                </div>
-                <div class="auth-field">
-                  <label for="loginPassword">Password</label>
-                  <input id="loginPassword" class="auth-input" type="password" name="password" autocomplete="current-password" required />
-                </div>
-              </div>
+          <div class="row between">
+            <a class="link" href="#" onclick="return false;">Forgot your password?</a>
+            <button class="btn btn-primary" type="submit">Sign in</button>
+          </div>
+        </form>
 
-              <div class="auth-row">
-                <a class="auth-link" href="#" aria-disabled="true" title="Coming soon">Forgot your password?</a>
-                <button class="btn btn-primary" type="submit">Sign in</button>
-              </div>
-            </form>
+        <!-- Create account -->
+        <form class="auth-form" id="form-signup" hidden>
+          <h1 class="auth-title">Create your account</h1>
+          <p class="auth-sub">One email per account. Picks reset weekly.</p>
 
-            <div class="auth-sep"></div>
-            <p class="auth-muted">New here? <a class="auth-link" href="#signup" id="goSignup">Create an account</a></p>
-          </section>
+          <label class="field">
+            <span class="field-label">Email</span>
+            <input class="field-input" type="email" placeholder="you@example.com" required>
+          </label>
 
-          <!-- SIGNUP PANEL -->
-          <section id="panelSignup" class="auth-panel" aria-labelledby="tabSignup" hidden>
-            <h1 class="auth-title">Create your account</h1>
-            <p class="auth-sub">No email verification yet—just pick a password and go.</p>
+          <label class="field">
+            <span class="field-label">Password</span>
+            <input class="field-input" type="password" placeholder="At least 8 characters" required>
+          </label>
 
-            <form id="formSignup" novalidate>
-              <div class="auth-grid">
-                <div class="auth-field">
-                  <label for="signupEmail">Email</label>
-                  <input id="signupEmail" class="auth-input" type="email" name="email" autocomplete="email" required />
-                </div>
-                <div class="auth-field">
-                  <label for="signupDisplay">Display name (shown on leaderboards)</label>
-                  <input id="signupDisplay" class="auth-input" type="text" name="display_name" minlength="2" maxlength="24" required />
-                </div>
-                <div class="auth-field">
-                  <label for="signupPassword">Password</label>
-                  <input id="signupPassword" class="auth-input" type="password" name="password" autocomplete="new-password" minlength="8" required />
-                </div>
-                <div class="auth-field">
-                  <label for="signupPassword2">Confirm password</label>
-                  <input id="signupPassword2" class="auth-input" type="password" name="password2" autocomplete="new-password" minlength="8" required />
-                </div>
-              </div>
+          <label class="checkbox">
+            <input type="checkbox" required>
+            <span>I agree to the Privacy Policy</span>
+          </label>
 
-              <div class="auth-actions">
-                <label style="display:flex;align-items:center;gap:8px;">
-                  <input id="signupTos" type="checkbox" required />
-                  <span>I agree to the <a class="auth-link" href="/privacy.html">Privacy Policy</a> &amp; <a class="auth-link" href="/terms.html">Terms</a>.</span>
-                </label>
-              </div>
-
-              <div class="auth-row">
-                <span></span>
-                <button class="btn btn-primary" type="submit">Create account</button>
-              </div>
-            </form>
-
-            <div class="auth-sep"></div>
-            <p class="auth-muted">Already have an account? <a class="auth-link" href="#login" id="goLogin">Sign in</a></p>
-          </section>
-        </div>
+          <div class="row end">
+            <button class="btn btn-primary" type="submit">Create account</button>
+          </div>
+        </form>
       </div>
     </div>
-  </main>
+  </div>
 
-  <!-- Optional shared footer -->
-  <!-- ... site-footer ... -->
-
-  <script src="js/auth.js"></script>
+  <!-- tiny tab toggler (optional, only for switching tabs) -->
+  <script>
+    document.addEventListener('click', e => {
+      const tab = e.target.closest('.auth-tab');
+      if (!tab) return;
+      document.querySelectorAll('.auth-tab').forEach(t => {
+        t.classList.toggle('is-active', t === tab);
+        t.setAttribute('aria-selected', t === tab ? 'true' : 'false');
+      });
+      const id = tab.dataset.tab; // "signin" or "signup"
+      document.querySelectorAll('.auth-form').forEach(f => {
+        f.hidden = (f.id !== `form-${id}`);
+      });
+    });
+  </script>
 </body>
-</html>
