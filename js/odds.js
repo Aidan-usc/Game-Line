@@ -6,7 +6,7 @@ const POST_KICK_HIDE_MS  = POST_KICK_HIDE_MIN * 60 * 1000;
 (function () {
   const API = "https://api.the-odds-api.com/v4";
   // Use config.js if present; otherwise fall back to the inline key you had
-  const KEY = (window.ODDS_API_KEY && String(window.ODDS_API_KEY)) || "85bd97903b7fe6cc8850b02f70e25ade";
+  const KEY = (window.ODDS_API_KEY && String(window.ODDS_API_KEY)) || "621d73608d860d481b0069526302c7ee";
   const REGIONS = "us";
   const MARKETS = "h2h,totals";
   const ODDS_FMT = "american";
@@ -329,4 +329,5 @@ const eqName = (a,b) => (window.__NAME_NORM__||((s)=>String(s||"").toLowerCase()
   // Expose
   window.OddsService = { getOddsFor };
 })();
+
 
