@@ -167,6 +167,24 @@ const POST_KICK_HIDE_MS  = POST_KICK_HIDE_MIN * 60 * 1000;
     };
   }
 
+  // ======== Power-4 + Notre Dame helpers (CFB only) ========
+  const POWER4_CONFS = new Set(["sec", "big ten", "big 12", "acc"]);
+  function _teamConfCFB(fullName){
+    const map = window.CFB_TEAM_TO_CONF || {};
+    const key = canonTeamName("sec", fullName);
+    return norm(map[key] || "");
+  }
+  function isPower4TeamCFB(name){
+    const conf = _teamConfCFB(name);
+    // include Notre Dame specifically (some maps label it "Independent", others "Notre Dame")
+    if (conf === "notre dame") return true;
+    if (conf === "independent" && norm(name).startsWith("notre dame")) return true;
+    return POWER4_CONFS.has(conf);
+  }
+  function isPower4MatchCFB(evt){
+    return isPower4TeamCFB(evt.away_team) || isPower4TeamCFB(evt.home_team);
+  }
+
   // ======== Filters UI ========
   function buildFiltersUI(sportKey) {
     const wrap = document.getElementById("filters");
@@ -191,7 +209,7 @@ const POST_KICK_HIDE_MS  = POST_KICK_HIDE_MIN * 60 * 1000;
           <button id="filter-refresh" class="btn btn-refresh" type="button" title="Refresh odds">↻</button>
         </div>
       </div>
-    `;
+    ";
 
     const sel = document.getElementById("filter-league");
     const opts =
@@ -241,8 +259,8 @@ const POST_KICK_HIDE_MS  = POST_KICK_HIDE_MIN * 60 * 1000;
       if (sportKey === "sec" && cfbMap) {
         const conf = norm(cfbMap[fullName] || "");
         if (!conf) return false;
-        // ND special-case: treat "Notre Dame" filter as Independent conf
-        if (val === "notre dame") return conf === "independent";
+        // ND special-case: treat a "Notre Dame" filter as matching either "notre dame" or "independent"
+        if (val === "notre dame") return (conf === "notre dame" || conf === "independent");
         return conf === val;
       }
       // if no map for this sport, don't filter out
@@ -262,7 +280,10 @@ const POST_KICK_HIDE_MS  = POST_KICK_HIDE_MIN * 60 * 1000;
     if (DAILY_CACHE) {
       const lsRaw = _readDaily(sportKey);
       if (lsRaw) {
-        const games = mapAndSort(lsRaw, sportKey).filter(hidePostKick);
+        // Apply CFB Power-4+ND restriction if this is the CFB page
+        let filtered = lsRaw;
+        if (sportKey === "sec") filtered = filtered.filter(isPower4MatchCFB);
+        const games = mapAndSort(filtered, sportKey).filter(hidePostKick);
         return wireFiltersAndRender(sportKey, games);
       }
     }
@@ -271,7 +292,9 @@ const POST_KICK_HIDE_MS  = POST_KICK_HIDE_MIN * 60 * 1000;
     const nowMs = Date.now();
     const hit = _CACHE[sportKey];
     if (hit && hit.expires > nowMs) {
-      const cachedGames = mapAndSort(hit.raw, sportKey).filter(hidePostKick);
+      let raw = hit.raw;
+      if (sportKey === "sec") raw = raw.filter(isPower4MatchCFB);
+      const cachedGames = mapAndSort(raw, sportKey).filter(hidePostKick);
       return wireFiltersAndRender(sportKey, cachedGames);
     }
 
@@ -292,7 +315,12 @@ const POST_KICK_HIDE_MS  = POST_KICK_HIDE_MIN * 60 * 1000;
     const json = await res.json();
 
     // Window filter (upper bound only)
-    const upcoming = (json || []).filter(e => new Date(e.commence_time) <= end);
+    let upcoming = (json || []).filter(e => new Date(e.commence_time) <= end);
+
+    // Restrict CFB page to Power-4 + Notre Dame only
+    if (sportKey === "sec") {
+      upcoming = upcoming.filter(isPower4MatchCFB);
+    }
 
     // Write daily cache for the day
     if (DAILY_CACHE) {
