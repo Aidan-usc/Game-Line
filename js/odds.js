@@ -14,12 +14,17 @@ const POST_KICK_HIDE_MS  = POST_KICK_HIDE_MIN * 60 * 1000;
   // Lookahead window (days)
   const WINDOW_DAYS = { mlb: 5, nfl: 9, sec: 9 };
 
-  // Page key -> Odds API key
+  // Page key -> Odds API key (canonical keys are 'mlb', 'nfl', 'sec')
   const SPORT_TO_API = {
     mlb: "baseball_mlb",
     nfl: "americanfootball_nfl",
     sec: "americanfootball_ncaaf",
   };
+
+  // Accept common aliases and normalize to canonical keys above
+  const SPORT_ALIASES = { cfb: "sec", ncaaf: "sec", college_football: "sec" };
+  const canonSportKey = k => (SPORT_ALIASES[String(k||"").toLowerCase()] || String(k||"").toLowerCase());
+  const isCFB = k => canonSportKey(k) === "sec";
 
   // Bookmaker priority (cascading)
   const BOOKS = ["draftkings", "fanduel", "betmgm", "caesars", "pointsbetus", "barstool"];
@@ -31,10 +36,9 @@ const POST_KICK_HIDE_MS  = POST_KICK_HIDE_MIN * 60 * 1000;
 
   function canonTeamName(sportKey, name) {
     const n = norm(name);
-    const al = (window.TEAM_ALIASES && window.TEAM_ALIASES[sportKey]) || {};
+    const al = (window.TEAM_ALIASES && window.TEAM_ALIASES[canonSportKey(sportKey)]) || {};
     return al[n] || n;
   }
-
   const eqName = (a,b) => norm(a) === norm(b);
 
   // ======== Date helpers ========
@@ -105,8 +109,30 @@ const POST_KICK_HIDE_MS  = POST_KICK_HIDE_MIN * 60 * 1000;
     } catch {}
   }
 
+  // ======== Power-4 + Notre Dame restriction for CFB ========
+  // Uses your window.CFB_TEAM_TO_CONF map (normalized values like 'sec', 'big ten', 'big 12', 'acc', 'independent', etc).
+  // Fails open (returns true) if the map is missing so we don't break the page during dev.
+  function isPower4MatchCFB(evt) {
+    const confMap = window.CFB_TEAM_TO_CONF;
+    if (!confMap) return true; // fail open if map not loaded
+
+    const awayKey = canonTeamName("sec", evt.away_team);
+    const homeKey = canonTeamName("sec", evt.home_team);
+    const cAway = norm(confMap[awayKey] || "");
+    const cHome = norm(confMap[homeKey] || "");
+
+    const isPower4Conf = (c, teamNameNorm) =>
+      c === "sec" || c === "big ten" || c === "big 12" || c === "acc" ||
+      (c === "independent" && teamNameNorm === "notre dame");
+
+    const awayIsND = norm(awayKey) === "notre dame";
+    const homeIsND = norm(homeKey) === "notre dame";
+
+    return isPower4Conf(cAway, awayIsND ? "notre dame" : "") ||
+           isPower4Conf(cHome, homeIsND ? "notre dame" : "");
+  }
+
   // ======== Market & mapping helpers ========
-  // Pick a market (h2h or totals) using BOOKS priority, then any book as fallback
   function pickMarket(bookmakers, key) {
     const list = bookmakers || [];
     const byPriority = BOOKS.map(k => list.find(b => b && b.key === k)).filter(Boolean);
@@ -149,9 +175,9 @@ const POST_KICK_HIDE_MS  = POST_KICK_HIDE_MIN * 60 * 1000;
       under = Number.isFinite(+underO?.price) ? +underO.price : null;
     }
 
-    // Location: show for MLB/NFL; hide for CFB (per your preference)
+    // Location: show for MLB/NFL; hide for CFB (your preference)
     const homeCity = evt.home_team.split(" ").slice(0, -1).join(" ") || evt.home_team;
-    const location = (sportKey === "sec") ? "" : homeCity;
+    const location = isCFB(sportKey) ? "" : homeCity;
 
     return {
       id: evt.id,
@@ -160,29 +186,11 @@ const POST_KICK_HIDE_MS  = POST_KICK_HIDE_MIN * 60 * 1000;
       location,
       awayFull: evt.away_team,
       homeFull: evt.home_team,
-      awayLogo: window.LogoFinder?.get(evt.away_team, sportKey),
-      homeLogo: window.LogoFinder?.get(evt.home_team, sportKey),
+      awayLogo: window.LogoFinder?.get(evt.away_team, canonSportKey(sportKey)),
+      homeLogo: window.LogoFinder?.get(evt.home_team, canonSportKey(sportKey)),
       mlAway, mlHome,
       total, over, under
     };
-  }
-
-  // ======== Power-4 + Notre Dame helpers (CFB only) ========
-  const POWER4_CONFS = new Set(["sec", "big ten", "big 12", "acc"]);
-  function _teamConfCFB(fullName){
-    const map = window.CFB_TEAM_TO_CONF || {};
-    const key = canonTeamName("sec", fullName);
-    return norm(map[key] || "");
-  }
-  function isPower4TeamCFB(name){
-    const conf = _teamConfCFB(name);
-    // include Notre Dame specifically (some maps label it "Independent", others "Notre Dame")
-    if (conf === "notre dame") return true;
-    if (conf === "independent" && norm(name).startsWith("notre dame")) return true;
-    return POWER4_CONFS.has(conf);
-  }
-  function isPower4MatchCFB(evt){
-    return isPower4TeamCFB(evt.away_team) || isPower4TeamCFB(evt.home_team);
   }
 
   // ======== Filters UI ========
@@ -190,7 +198,7 @@ const POST_KICK_HIDE_MS  = POST_KICK_HIDE_MIN * 60 * 1000;
     const wrap = document.getElementById("filters");
     if (!wrap) return;
 
-    const labelText = sportKey === "sec" ? "Conference" : "Division";
+    const labelText = isCFB(sportKey) ? "Conference" : "Division";
 
     wrap.innerHTML = `
       <div class="filter-bar-inner">
@@ -209,21 +217,20 @@ const POST_KICK_HIDE_MS  = POST_KICK_HIDE_MIN * 60 * 1000;
           <button id="filter-refresh" class="btn btn-refresh" type="button" title="Refresh odds">↻</button>
         </div>
       </div>
-    ";
+    `;
 
     const sel = document.getElementById("filter-league");
     const opts =
-      sportKey === "mlb" ? [
+      canonSportKey(sportKey) === "mlb" ? [
         "All",
         "AL East","AL Central","AL West",
         "NL East","NL Central","NL West"
       ] :
-      sportKey === "nfl" ? [
+      canonSportKey(sportKey) === "nfl" ? [
         "All",
         "AFC East","AFC North","AFC South","AFC West",
         "NFC East","NFC North","NFC South","NFC West"
-      ] :
-      [
+      ] : [
         "All (Power 4 + ND)",
         "SEC","Big Ten","Big 12","ACC","Notre Dame"
       ];
@@ -248,19 +255,18 @@ const POST_KICK_HIDE_MS  = POST_KICK_HIDE_MIN * 60 * 1000;
     const home = canonTeamName(sportKey, game.homeFull);
 
     const teamMatches = (fullName) => {
-      if (sportKey === "mlb" && mlbMap) {
+      if (canonSportKey(sportKey) === "mlb" && mlbMap) {
         const div = norm(mlbMap[fullName] || "");
         return !!div && div === val;
       }
-      if (sportKey === "nfl" && nflMap) {
+      if (canonSportKey(sportKey) === "nfl" && nflMap) {
         const div = norm(nflMap[fullName] || "");
         return !!div && div === val;
       }
-      if (sportKey === "sec" && cfbMap) {
+      if (isCFB(sportKey) && cfbMap) {
         const conf = norm(cfbMap[fullName] || "");
         if (!conf) return false;
-        // ND special-case: treat a "Notre Dame" filter as matching either "notre dame" or "independent"
-        if (val === "notre dame") return (conf === "notre dame" || conf === "independent");
+        if (val === "notre dame") return conf === "independent"; // ND special
         return conf === val;
       }
       // if no map for this sport, don't filter out
@@ -272,34 +278,33 @@ const POST_KICK_HIDE_MS  = POST_KICK_HIDE_MIN * 60 * 1000;
 
   // ======== Public API ========
   async function getOddsFor(sportKey) {
-    const sportApi = SPORT_TO_API[sportKey];
+    const sk = canonSportKey(sportKey);
+    const sportApi = SPORT_TO_API[sk];
     if (!sportApi) throw new Error(`Unknown sport key: ${sportKey}`);
     if (!KEY) throw new Error("Missing API key (window.ODDS_API_KEY)");
 
     // Daily cache short-circuit (per browser)
     if (DAILY_CACHE) {
-      const lsRaw = _readDaily(sportKey);
+      const lsRaw = _readDaily(sk);
       if (lsRaw) {
-        // Apply CFB Power-4+ND restriction if this is the CFB page
-        let filtered = lsRaw;
-        if (sportKey === "sec") filtered = filtered.filter(isPower4MatchCFB);
-        const games = mapAndSort(filtered, sportKey).filter(hidePostKick);
-        return wireFiltersAndRender(sportKey, games);
+        const raw = isCFB(sk) ? lsRaw.filter(isPower4MatchCFB) : lsRaw;
+        const games = mapAndSort(raw, sk).filter(hidePostKick);
+        return wireFiltersAndRender(sk, games);
       }
     }
 
     // In-memory cache short-circuit
     const nowMs = Date.now();
-    const hit = _CACHE[sportKey];
+    const hit = _CACHE[sk];
     if (hit && hit.expires > nowMs) {
       let raw = hit.raw;
-      if (sportKey === "sec") raw = raw.filter(isPower4MatchCFB);
-      const cachedGames = mapAndSort(raw, sportKey).filter(hidePostKick);
-      return wireFiltersAndRender(sportKey, cachedGames);
+      if (isCFB(sk)) raw = raw.filter(isPower4MatchCFB);
+      const cachedGames = mapAndSort(raw, sk).filter(hidePostKick);
+      return wireFiltersAndRender(sk, cachedGames);
     }
 
     // Network fetch
-    const end = addDays(new Date(), WINDOW_DAYS[sportKey] || 5);
+    const end = addDays(new Date(), WINDOW_DAYS[sk] || 5);
     const url = new URL(`${API}/sports/${sportApi}/odds`);
     url.searchParams.set("apiKey", KEY);
     url.searchParams.set("regions", REGIONS);
@@ -312,30 +317,25 @@ const POST_KICK_HIDE_MS  = POST_KICK_HIDE_MIN * 60 * 1000;
       const txt = await res.text();
       throw new Error(`Odds API ${res.status}: ${txt}`);
     }
-    const json = await res.json();
+    let upcoming = (await res.json() || []).filter(e => new Date(e.commence_time) <= end);
 
-    // Window filter (upper bound only)
-    let upcoming = (json || []).filter(e => new Date(e.commence_time) <= end);
-
-    // Restrict CFB page to Power-4 + Notre Dame only
-    if (sportKey === "sec") {
-      upcoming = upcoming.filter(isPower4MatchCFB);
-    }
+    // Restrict CFB to Power-4 + Notre Dame
+    if (isCFB(sk)) upcoming = upcoming.filter(isPower4MatchCFB);
 
     // Write daily cache for the day
     if (DAILY_CACHE) {
-      _purgeOldDaily(sportKey);
-      _writeDaily(sportKey, upcoming);
+      _purgeOldDaily(sk);
+      _writeDaily(sk, upcoming);
     }
 
     // Also keep an in-memory TTL cache in this tab
-    _CACHE[sportKey] = {
+    _CACHE[sk] = {
       raw: upcoming,
       expires: nowMs + chooseTTLMillis(upcoming)
     };
 
-    const games = mapAndSort(upcoming, sportKey).filter(hidePostKick);
-    return wireFiltersAndRender(sportKey, games);
+    const games = mapAndSort(upcoming, sk).filter(hidePostKick);
+    return wireFiltersAndRender(sk, games);
   }
 
   // Map + sort helper
