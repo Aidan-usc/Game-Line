@@ -200,7 +200,7 @@ body {
   transform: translate(-50%, -50%);
   margin:0;
   font-family: var(--font-nav);
-  font-size: clamp(24px, 2.4vw, 30px);
+  font-size: clamp(24px, 2.4vw, 26px);
   color: var(--indigo);
 }
 
@@ -500,6 +500,7 @@ body {
 /* HOME responsive tweaks */
 @media (max-width: 1024px) { .card-grid.three { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 680px)  { .card-grid.three { grid-template-columns: 1fr; } }
+
 
 
 
