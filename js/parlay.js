@@ -276,26 +276,27 @@
 
     // Render legs
     ul.innerHTML = state.legs.map(renderLeg).join("");
+    
+// inside updateRail() after you filter out the removed leg
+ul.querySelectorAll(".remove").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const id = btn.dataset.id;
+    const leg = state.legs.find(l => l.id === id);
 
-    // Bind remove buttons
-    ul.querySelectorAll(".remove").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const id = btn.dataset.id;
-        const leg = state.legs.find(l => l.id === id);
-        const card = leg && document.querySelector(`.game-card[data-game="${leg.eventId}"]`);
-        if (card) {
-          card.querySelectorAll(".pick-btn").forEach(b => {
-            try {
-              const p = JSON.parse(b.dataset.payload);
-              if (p.market === leg.market) b.classList.remove("selected");
-            } catch {}
-          });
-        }
-        state.legs = state.legs.filter(l => l.id !== id);
-        if (state.legs.length === 0) setRailMode("bets");
-        updateRail();
-      });
+    // unselect buttons on that card
+    const card = document.querySelector(`.game-card[data-game="${leg.eventId}"]`);
+    if (card) card.querySelectorAll(".pick-btn").forEach(b => {
+      try { const p = JSON.parse(b.dataset.payload);
+        if (p.market === leg.market) b.classList.remove("selected");
+      } catch {}
     });
+
+    state.legs = state.legs.filter(l => l.id !== id);
+    // ⬇️ ensure instant revert when count hits zero
+    if (state.legs.length === 0) setRailMode("bets");
+    updateRail();
+  });
+});
 
     // Totals
     const oddsArr = state.legs.map(l => l.odds);
@@ -427,5 +428,6 @@ function renderLeg(l) {
     ];
   }
 })();
+
 
 
