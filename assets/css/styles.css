@@ -187,6 +187,7 @@ body {
 }
 
 .rail-header{
+  height:25px;
   position: relative;
   display: block;                  /* break out of flex */
   padding: 12px 14px;
