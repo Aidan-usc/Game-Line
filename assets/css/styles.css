@@ -187,7 +187,7 @@ body {
 }
 
 .rail-header{
-  height:25px;
+  height:50px;
   position: relative;
   display: block;                  /* break out of flex */
   padding: 12px 14px;
@@ -501,6 +501,7 @@ body {
 /* HOME responsive tweaks */
 @media (max-width: 1024px) { .card-grid.three { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 680px)  { .card-grid.three { grid-template-columns: 1fr; } }
+
 
 
 
