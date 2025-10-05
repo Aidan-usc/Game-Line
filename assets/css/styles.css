@@ -186,29 +186,31 @@ body {
   overflow:hidden;
 }
 
-/* header with clear (×) button aligned to the right */
 .rail-header{
-  position:sticky; top:0; z-index:2;
-  display:flex; align-items:center; justify-content:space-between;
-  gap:8px;
-  background:linear-gradient(180deg,rgba(251,247,255,.96),rgba(251,247,255,.86));
-  backdrop-filter:blur(6px);
-  border-bottom:1px dashed rgba(59,30,118,.25);
-  padding:14px 14px 12px;
+  position: relative;
+  display: block;                  /* break out of flex */
+  padding: 12px 14px;
+  border-bottom: 1px dashed #eae6ff;
 }
+
+/* Center title regardless of the X on the right */
 .rail-title{
-  padding-left:30px;
-  font-family:var(--font-nav); 
-  font-size:28px; 
-  color:var(--indigo);
-  margin:0; line-height:1;
+  position:absolute;
+  left:50%; top:50%;
+  transform: translate(-50%, -50%);
+  margin:0;
+  font-family: var(--font-nav);
+  font-size: clamp(24px, 2.4vw, 30px);
+  color: var(--indigo);
 }
+
+/* Keep your close/clear button pinned right */
 .rail-clear{
-  padding-left:30px;
-  width:34px; height:34px; line-height:34px; text-align:center;
-  border:0; border-radius:10px; font-size:22px; font-weight:900;
-  background:transparent; color:#7a6db7; cursor:pointer;
+  position:absolute;
+  right:10px; top:50%;
+  transform: translateY(-50%);
 }
+
 .rail-clear:hover{ background:rgba(59,30,118,.07); color:#c0392b; }
 
 /* scroll area + padded bottom so legs never tuck under footer */
@@ -498,6 +500,7 @@ body {
 /* HOME responsive tweaks */
 @media (max-width: 1024px) { .card-grid.three { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 680px)  { .card-grid.three { grid-template-columns: 1fr; } }
+
 
 
 
