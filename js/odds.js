@@ -5,10 +5,10 @@ const POST_KICK_HIDE_MS  = POST_KICK_HIDE_MIN * 60 * 1000;
 // js/odds.js
 (function () {
   const API = "https://api.the-odds-api.com/v4";
-  // Use config.js if present; otherwise fall back to the inline key you had
+  // Prefer config.js if present; otherwise use inline key
   const KEY = (window.ODDS_API_KEY && String(window.ODDS_API_KEY)) || "621d73608d860d481b0069526302c7ee";
-  const REGIONS = "us";
-  const MARKETS = "h2h,totals";
+  const REGIONS  = "us";
+  const MARKETS  = "h2h,totals";
   const ODDS_FMT = "american";
 
   // Lookahead window (days)
@@ -21,10 +21,10 @@ const POST_KICK_HIDE_MS  = POST_KICK_HIDE_MIN * 60 * 1000;
     sec: "americanfootball_ncaaf",
   };
 
-  // Bookmaker priority
+  // Bookmaker priority (cascading)
   const BOOKS = ["draftkings", "fanduel", "betmgm", "caesars", "pointsbetus", "barstool"];
 
-  // ---- Helpers ----
+  // ======== Name normalization & aliases ========
   const norm =
     (window.__NAME_NORM__) ||
     (s => String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim());
@@ -35,6 +35,9 @@ const POST_KICK_HIDE_MS  = POST_KICK_HIDE_MIN * 60 * 1000;
     return al[n] || n;
   }
 
+  const eqName = (a,b) => norm(a) === norm(b);
+
+  // ======== Date helpers ========
   const addDays = (d, n) => {
     const t = new Date(d);
     t.setDate(t.getDate() + n);
@@ -50,7 +53,7 @@ const POST_KICK_HIDE_MS  = POST_KICK_HIDE_MIN * 60 * 1000;
     } catch { return ""; }
   }
 
-  // Variable TTL in-memory cache (per sport)
+  // ======== Variable TTL in-memory cache (per session) ========
   // <= 24h -> 20m, <=48h -> 60m, >48h -> 120m
   const _CACHE = {}; // { [sportKey]: { expires:number, raw:any[] } }
 
@@ -68,55 +71,103 @@ const POST_KICK_HIDE_MS  = POST_KICK_HIDE_MIN * 60 * 1000;
     return 120 * 60 * 1000;                            // 2 hours for 3+ days
   }
 
-  function chooseBook(bookmakers) {
-    const byKey = {};
-    for (const b of (bookmakers || [])) byKey[b.key] = b;
-    for (const pref of BOOKS) if (byKey[pref]) return byKey[pref];
-    return bookmakers?.[0];
+  // ======== DEV daily cache (per browser, resets at local midnight) ========
+  const DAILY_CACHE = true; // flip to false later when you want fresher pulls
+
+  function _todayKey() {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}${m}${day}`;
+  }
+  const _LS_DAILY_KEY = (sport) => `odds_daily_${sport}_${_todayKey()}`;
+
+  function _readDaily(sport) {
+    try {
+      const raw = localStorage.getItem(_LS_DAILY_KEY(sport));
+      if (!raw) return null;
+      const obj = JSON.parse(raw);
+      return Array.isArray(obj.raw) ? obj.raw : null;
+    } catch { return null; }
+  }
+  function _writeDaily(sport, events) {
+    try { localStorage.setItem(_LS_DAILY_KEY(sport), JSON.stringify({ raw: events })); } catch {}
+  }
+  function _purgeOldDaily(sport) {
+    try {
+      for (let i = localStorage.length - 1; i >= 0; i--) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith(`odds_daily_${sport}_`) && k !== _LS_DAILY_KEY(sport)) {
+          localStorage.removeItem(k);
+        }
+      }
+    } catch {}
+  }
+
+  // ======== Market & mapping helpers ========
+  // Pick a market (h2h or totals) using BOOKS priority, then any book as fallback
+  function pickMarket(bookmakers, key) {
+    const list = bookmakers || [];
+    const byPriority = BOOKS.map(k => list.find(b => b && b.key === k)).filter(Boolean);
+
+    for (const b of byPriority) {
+      const m = (b.markets || []).find(x => x.key === key);
+      if (m?.outcomes?.length >= 2) return m;
+    }
+    for (const b of list) {
+      const m = (b.markets || []).find(x => x.key === key);
+      if (m?.outcomes?.length >= 2) return m;
+    }
+    return null;
   }
 
   // Map an API event to your card model
-function mapEventToGame(evt, sportKey) {
-  const h2h    = pickMarket(evt.bookmakers, "h2h");
-  const totals = pickMarket(evt.bookmakers, "totals");
+  function mapEventToGame(evt, sportKey) {
+    const h2h    = pickMarket(evt.bookmakers, "h2h");
+    const totals = pickMarket(evt.bookmakers, "totals");
 
-  // Moneyline
-  let mlAway = null, mlHome = null;
-  if (h2h?.outcomes?.length) {
-    const oAway = h2h.outcomes.find(o => eqName(o.name, evt.away_team));
-    const oHome = h2h.outcomes.find(o => eqName(o.name, evt.home_team));
-    mlAway = Number.isFinite(+oAway?.price) ? oAway.price : null;
-    mlHome = Number.isFinite(+oHome?.price) ? oHome.price : null;
+    // Moneyline
+    let mlAway = null, mlHome = null;
+    if (h2h?.outcomes?.length) {
+      const oAway = h2h.outcomes.find(o => eqName(o.name, evt.away_team));
+      const oHome = h2h.outcomes.find(o => eqName(o.name, evt.home_team));
+      mlAway = Number.isFinite(+oAway?.price) ? +oAway.price : null;
+      mlHome = Number.isFinite(+oHome?.price) ? +oHome.price : null;
+    }
+
+    // Totals
+    let total = null, over = null, under = null;
+    if (totals?.outcomes?.length) {
+      const overO  = totals.outcomes.find(o => norm(o.name) === "over");
+      const underO = totals.outcomes.find(o => norm(o.name) === "under");
+      const line   = Number.isFinite(+overO?.point) ? +overO.point
+                   : Number.isFinite(+underO?.point) ? +underO.point
+                   : null;
+      total = line;
+      over  = Number.isFinite(+overO?.price)  ? +overO.price  : null;
+      under = Number.isFinite(+underO?.price) ? +underO.price : null;
+    }
+
+    // Location: show for MLB/NFL; hide for CFB (per your preference)
+    const homeCity = evt.home_team.split(" ").slice(0, -1).join(" ") || evt.home_team;
+    const location = (sportKey === "sec") ? "" : homeCity;
+
+    return {
+      id: evt.id,
+      ts: new Date(evt.commence_time).getTime(),
+      time: fmtDT(evt.commence_time),
+      location,
+      awayFull: evt.away_team,
+      homeFull: evt.home_team,
+      awayLogo: window.LogoFinder?.get(evt.away_team, sportKey),
+      homeLogo: window.LogoFinder?.get(evt.home_team, sportKey),
+      mlAway, mlHome,
+      total, over, under
+    };
   }
 
-  // Totals
-  let total = null, over = null, under = null;
-  if (totals?.outcomes?.length) {
-    const overO  = totals.outcomes.find(o => String(o.name).toLowerCase() === "over");
-    const underO = totals.outcomes.find(o => String(o.name).toLowerCase() === "under");
-    const line   = Number.isFinite(+overO?.point) ? +overO.point : (Number.isFinite(+underO?.point) ? +underO.point : null);
-    total = line;
-    over  = Number.isFinite(+overO?.price)  ? overO.price  : null;
-    under = Number.isFinite(+underO?.price) ? underO.price : null;
-  }
-
-  const homeCity = evt.home_team.split(" ").slice(0, -1).join(" ") || evt.home_team;
-
-  return {
-    id: evt.id,
-    ts: new Date(evt.commence_time).getTime(),
-    time: fmtDT(evt.commence_time),
-    location: homeCity,
-    awayFull: evt.away_team,
-    homeFull: evt.home_team,
-    awayLogo: window.LogoFinder?.get(evt.away_team, sportKey),
-    homeLogo: window.LogoFinder?.get(evt.home_team, sportKey),
-    mlAway, mlHome,
-    total, over, under
-  };
-}
-
-  // ---- Filters UI ----
+  // ======== Filters UI ========
   function buildFiltersUI(sportKey) {
     const wrap = document.getElementById("filters");
     if (!wrap) return;
@@ -142,7 +193,6 @@ function mapEventToGame(evt, sportKey) {
       </div>
     `;
 
-    // options by sport
     const sel = document.getElementById("filter-league");
     const opts =
       sportKey === "mlb" ? [
@@ -159,6 +209,7 @@ function mapEventToGame(evt, sportKey) {
         "All (Power 4 + ND)",
         "SEC","Big Ten","Big 12","ACC","Notre Dame"
       ];
+
     for (const o of opts) {
       const el = document.createElement("option");
       el.value = o; el.textContent = o;
@@ -166,7 +217,7 @@ function mapEventToGame(evt, sportKey) {
     }
   }
 
-  // Division/conf matching with maps from meta.js
+  // Division/conf matching with maps from meta.js (match if either team belongs)
   function matchDivisionConf(sportKey, filterValue, game) {
     const val = norm(filterValue || "");
     if (!val || val.startsWith("all")) return true;
@@ -190,30 +241,41 @@ function mapEventToGame(evt, sportKey) {
       if (sportKey === "sec" && cfbMap) {
         const conf = norm(cfbMap[fullName] || "");
         if (!conf) return false;
-        if (val === "notre dame") return conf === "notre dame";
+        // ND special-case: treat "Notre Dame" filter as Independent conf
+        if (val === "notre dame") return conf === "independent";
         return conf === val;
       }
-      return true; // fail-open if map missing
+      // if no map for this sport, don't filter out
+      return true;
     };
 
     return teamMatches(away) || teamMatches(home);
   }
 
-  // ---- Public API ----
+  // ======== Public API ========
   async function getOddsFor(sportKey) {
     const sportApi = SPORT_TO_API[sportKey];
     if (!sportApi) throw new Error(`Unknown sport key: ${sportKey}`);
     if (!KEY) throw new Error("Missing API key (window.ODDS_API_KEY)");
 
-    const nowMs = Date.now();
+    // Daily cache short-circuit (per browser)
+    if (DAILY_CACHE) {
+      const lsRaw = _readDaily(sportKey);
+      if (lsRaw) {
+        const games = mapAndSort(lsRaw, sportKey).filter(hidePostKick);
+        return wireFiltersAndRender(sportKey, games);
+      }
+    }
 
-    // cache hit?
+    // In-memory cache short-circuit
+    const nowMs = Date.now();
     const hit = _CACHE[sportKey];
     if (hit && hit.expires > nowMs) {
-      const cachedGames = mapAndSort(hit.raw, sportKey);
+      const cachedGames = mapAndSort(hit.raw, sportKey).filter(hidePostKick);
       return wireFiltersAndRender(sportKey, cachedGames);
     }
 
+    // Network fetch
     const end = addDays(new Date(), WINDOW_DAYS[sportKey] || 5);
     const url = new URL(`${API}/sports/${sportApi}/odds`);
     url.searchParams.set("apiKey", KEY);
@@ -229,16 +291,22 @@ function mapEventToGame(evt, sportKey) {
     }
     const json = await res.json();
 
-    // Keep only events within lookahead window (upper bound only)
+    // Window filter (upper bound only)
     const upcoming = (json || []).filter(e => new Date(e.commence_time) <= end);
 
-    // cache raw
+    // Write daily cache for the day
+    if (DAILY_CACHE) {
+      _purgeOldDaily(sportKey);
+      _writeDaily(sportKey, upcoming);
+    }
+
+    // Also keep an in-memory TTL cache in this tab
     _CACHE[sportKey] = {
       raw: upcoming,
       expires: nowMs + chooseTTLMillis(upcoming)
     };
 
-    const games = mapAndSort(upcoming, sportKey);
+    const games = mapAndSort(upcoming, sportKey).filter(hidePostKick);
     return wireFiltersAndRender(sportKey, games);
   }
 
@@ -249,31 +317,12 @@ function mapEventToGame(evt, sportKey) {
     return games;
   }
 
-  // Pick a market (h2h or totals) from our priority list; fall back to any that has 2+ outcomes
-function pickMarket(bookmakers, key) {
-  const list = bookmakers || [];
-  const byPriority = BOOKS
-    .map(k => list.find(b => b.key === k))
-    .filter(Boolean);
-
-  // First, try by our priority
-  for (const b of byPriority) {
-    const m = (b.markets || []).find(x => x.key === key);
-    if (m?.outcomes?.length >= 2) return m;
+  // Post-kickoff hiding predicate
+  function hidePostKick(g) {
+    return Date.now() <= (g.ts + POST_KICK_HIDE_MS);
   }
-  // Fallback: any book that has both sides
-  for (const b of list) {
-    const m = (b.markets || []).find(x => x.key === key);
-    if (m?.outcomes?.length >= 2) return m;
-  }
-  return null;
-}
 
-const eqName = (a,b) => (window.__NAME_NORM__||((s)=>String(s||"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim()))(a) ===
-                        (window.__NAME_NORM__||((s)=>String(s||"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim()))(b);
-
-
-  // Build filters, attach handlers, and render with post-kick hiding
+  // Build filters, attach handlers, and render (with periodic refresh for post-kick hide)
   function wireFiltersAndRender(sportKey, allGames) {
     buildFiltersUI(sportKey);
 
@@ -284,12 +333,9 @@ const eqName = (a,b) => (window.__NAME_NORM__||((s)=>String(s||"").toLowerCase()
     function computeFiltered() {
       const q = (search?.value || "").trim().toLowerCase();
       const bucket = sel?.value || "";
-      const nowMs = Date.now();
 
-      const filtered = allGames
-        // hide games >= 10 minutes after kickoff
-        .filter(g => nowMs <= (g.ts + POST_KICK_HIDE_MS))
-        // text + division/conf bucket
+      const list = allGames
+        .filter(hidePostKick)
         .filter(g => {
           const hitsText = !q || g.awayFull.toLowerCase().includes(q) || g.homeFull.toLowerCase().includes(q);
           const hitsBucket = matchDivisionConf(sportKey, bucket, g);
@@ -297,7 +343,7 @@ const eqName = (a,b) => (window.__NAME_NORM__||((s)=>String(s||"").toLowerCase()
         })
         .sort((a, b) => a.ts - b.ts);
 
-      return filtered;
+      return list;
     }
 
     function applyFilters() {
@@ -318,7 +364,7 @@ const eqName = (a,b) => (window.__NAME_NORM__||((s)=>String(s||"").toLowerCase()
     const initial = computeFiltered();
     window.reRenderOdds && window.reRenderOdds(initial);
 
-    // Re-check every 60s so games drop off 10 min after kickoff automatically
+    // Re-check every 60s so games auto-hide ~10 minutes after kickoff
     if (!window.__kickoffHideTimer) {
       window.__kickoffHideTimer = setInterval(applyFilters, 60_000);
     }
@@ -329,5 +375,3 @@ const eqName = (a,b) => (window.__NAME_NORM__||((s)=>String(s||"").toLowerCase()
   // Expose
   window.OddsService = { getOddsFor };
 })();
-
-
