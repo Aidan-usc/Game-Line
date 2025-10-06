@@ -1,3 +1,15 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sign in · Phantom Picks</title>
+
+  <!-- Load site styles -->
+  <link rel="stylesheet" href="/assets/css/styles.css?v=auth2">
+  <!-- If this file lives in a subfolder, make the path relative instead, e.g.:
+       ../assets/css/styles.css?v=auth2  or  ../../assets/css/styles.css?v=auth2 -->
+</head>
 <body class="page-content no-rail">
   <div class="auth-wrap">
     <div class="auth-card">
@@ -56,14 +68,15 @@
     </div>
   </div>
 
-  <!-- tiny tab toggler (optional, only for switching tabs) -->
+  <!-- Tiny tab toggler (for switching between Sign in / Create account) -->
   <script>
     document.addEventListener('click', e => {
       const tab = e.target.closest('.auth-tab');
       if (!tab) return;
       document.querySelectorAll('.auth-tab').forEach(t => {
-        t.classList.toggle('is-active', t === tab);
-        t.setAttribute('aria-selected', t === tab ? 'true' : 'false');
+        const active = t === tab;
+        t.classList.toggle('is-active', active);
+        t.setAttribute('aria-selected', active ? 'true' : 'false');
       });
       const id = tab.dataset.tab; // "signin" or "signup"
       document.querySelectorAll('.auth-form').forEach(f => {
@@ -72,3 +85,4 @@
     });
   </script>
 </body>
+</html>
