@@ -20,7 +20,7 @@
 }
 
 *{ box-sizing:border-box; 
- color: #fff;
+ ;
  }
 
 body{
@@ -527,6 +527,7 @@ body{
   .row.between{ flex-direction: column; align-items: stretch; gap:10px; }
   .row.between .btn{ width:100%; }
 }
+
 
 
 
