@@ -5,14 +5,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Sign in · Phantom Picks</title>
 
-  <!-- Load site styles -->
- <link rel="stylesheet" href="assets/css/styles.css?v=auth3">
-  <!-- If this file lives in a subfolder, make the path relative instead, e.g.:
-       ../assets/css/styles.css?v=auth2  or  ../../assets/css/styles.css?v=auth2 -->
+  <!-- Site CSS (adjust path if this file sits in a subfolder) -->
+  <link rel="stylesheet" href="/assets/css/styles.css?v=auth3">
 </head>
-<body class="page-content no-rail">
-  <div class="auth-wrap">
-    <div class="auth-card">
+
+<body class="auth-page">
+  <!-- Slim header: logo + wordmark only -->
+  <header class="site-header site-header--auth">
+    <a class="brand" href="/index.html">
+      <!-- Use the same logo src you use on your other pages -->
+      <img class="site-logo" src="/assets/img/logo.svg" alt="Phantom Picks logo" />
+      <span class="logo-text">Phantom Picks</span>
+    </a>
+
+    <!-- deliberately empty; hidden by CSS on this page -->
+    <nav class="primary-nav" aria-hidden="true"></nav>
+    <div class="account-area" aria-hidden="true"></div>
+  </header>
+
+  <main class="auth-wrap">
+    <section class="auth-card">
       <div class="auth-tabs" role="tablist" aria-label="Auth tabs">
         <button class="auth-tab is-active" data-tab="signin" aria-selected="true">Sign in</button>
         <button class="auth-tab" data-tab="signup" aria-selected="false">Create account</button>
@@ -65,10 +77,10 @@
           </div>
         </form>
       </div>
-    </div>
-  </div>
+    </section>
+  </main>
 
-  <!-- Tiny tab toggler (for switching between Sign in / Create account) -->
+  <!-- Tab toggler -->
   <script>
     document.addEventListener('click', e => {
       const tab = e.target.closest('.auth-tab');
