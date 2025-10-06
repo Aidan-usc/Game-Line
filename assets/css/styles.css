@@ -213,6 +213,7 @@ body{
   border-top:1px dashed rgba(59,30,118,.20);
   box-shadow:0 -6px 18px rgba(0,0,0,.06);
   border-radius:0 0 12px 12px;
+  color: #fff;
 }
 .rail-summary{ display:grid; gap:10px; }
 .rail-summary .row{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
@@ -525,3 +526,4 @@ body{
   .row.between{ flex-direction: column; align-items: stretch; gap:10px; }
   .row.between .btn{ width:100%; }
 }
+
