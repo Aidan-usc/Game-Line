@@ -528,6 +528,39 @@ body{
   .row.between .btn{ width:100%; }
 }
 
+/* ===== Leaderboard (front-end mock) ===== */
+.lb-wrap{max-width:1200px;margin:0 auto;padding:16px;}
+.lb-top{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;margin:8px 0 14px;}
+.lb-tabs{display:flex;border-bottom:1px dashed #e7e0ff;background:linear-gradient(90deg,#f8f6ff,#fff);}
+.lb-tab{flex:0 0 auto;padding:10px 14px;font-family:var(--font-nav);letter-spacing:.06em;color:var(--indigo);cursor:pointer;border-right:1px dashed #e7e0ff;background:transparent;}
+.lb-tab.is-active{background:#fff;border-bottom:2px solid var(--maize);}
+.lb-filters{display:flex;gap:10px;align-items:center;justify-content:flex-end;}
+.lb-select,.lb-search{font-family:var(--font-body);border:2px solid rgba(59,30,118,.22);border-radius:12px;background:#fff;padding:10px 12px;}
+.lb-search{min-width:220px}
+.lb-cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:12px 0 16px;}
+.lb-card{background:#fff;border:2px solid rgba(59,30,118,.14);border-radius:14px;box-shadow:var(--shadow);padding:14px 16px;}
+.lb-card h4{margin:0 0 6px 0;font-family:var(--font-nav);color:var(--indigo);font-size:16px}
+.lb-card .big{font-size:22px;font-weight:800}
+.lb-card .muted{opacity:.75}
+.lb-table{width:100%;border-collapse:separate;border-spacing:0;background:#fff;border:2px solid rgba(0,0,0,.06);box-shadow:var(--shadow);border-radius:14px;overflow:hidden}
+.lb-table th,.lb-table td{padding:12px 10px;border-bottom:1px solid #eee;text-align:left;vertical-align:middle}
+.lb-table thead th{background:#f7f3ff;color:#3b1e76;font-family:var(--font-nav);font-size:14px}
+.lb-table tbody tr:last-child td{border-bottom:none}
+.lb-rank{width:56px;text-align:center;font-weight:800;color:#5a4aa8}
+.lb-handle{font-weight:800}
+.lb-badge{display:inline-block;padding:2px 8px;border-radius:999px;background:rgba(59,30,118,.08);color:#5a4aa8;font-size:12px;font-weight:800;margin-left:6px}
+.lb-foot{margin-top:10px;opacity:.7;font-size:13px}
+.lb-sort{cursor:pointer}
+@media (max-width:900px){
+  .lb-top{grid-template-columns:1fr;gap:8px}
+  .lb-cards{grid-template-columns:1fr 1fr}
+  .lb-search{min-width:0}
+}
+@media (max-width:560px){
+  .lb-cards{grid-template-columns:1fr}
+  .lb-table .hide-sm{display:none}
+}
+
 
 
 
