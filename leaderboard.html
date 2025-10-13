@@ -5,113 +5,127 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Leaderboard · Phantom Picks</title>
 
-  <!-- Site styles -->
-  <link rel="stylesheet" href="assets/css/styles.css?v=lb4" />
+  <!-- Use your existing site stylesheet (relative path for GitHub Pages) -->
+  <link rel="stylesheet" href="assets/css/styles.css?v=lb5">
 </head>
 <body>
-<div id="header"></div>
-  <!-- Shared header (populated by your partial loader in assets/js/app.js) -->
-  <header id="site-header"></header>
 
-  <main class="page-content no-rail">
-    <!-- Banner -->
-    <section class="league-banner leaderboard-banner">
+  <!-- Header partial goes here -->
+  <div id="site-header"></div>
+
+  <!-- Main content -->
+  <main class="page-content" id="leaderboard-page">
+    <section class="league-banner league-sec">
       <div class="banner-inner">
         <h1>Leaderboard</h1>
         <p>Track the hottest hands and biggest swings across Phantom Picks.</p>
       </div>
     </section>
 
-    <div class="lb-wrap">
-      <!-- Filters -->
-      <div class="lb-filters">
-        <div class="left">
-          <div class="lb-seg" aria-label="Range">
-            <button type="button" class="is-active" data-range="7d">7 days</button>
-            <button type="button" data-range="30d">30 days</button>
-            <button type="button" data-range="all">All time</button>
+    <div class="filter-bar">
+      <div class="filter-bar-inner">
+        <div class="filter-left" style="gap:10px">
+          <div class="select-wrap">
+            <button class="btn btn-refresh" data-range="7d"   id="lb-7d">7 days</button>
+            <button class="btn btn-refresh" data-range="30d"  id="lb-30d">30 days</button>
+            <button class="btn btn-refresh" data-range="all"  id="lb-all">All time</button>
           </div>
 
-          <div class="lb-seg" aria-label="Scope">
-            <button type="button" class="is-active" data-scope="net">Net</button>
-            <button type="button" data-scope="roi">ROI</button>
-            <button type="button" data-scope="volume">Volume</button>
+          <div class="select-wrap">
+            <button class="btn btn-refresh" data-metric="net"    id="lb-m-net">Net</button>
+            <button class="btn btn-refresh" data-metric="roi"    id="lb-m-roi">ROI</button>
+            <button class="btn btn-refresh" data-metric="volume" id="lb-m-vol">Volume</button>
           </div>
         </div>
 
-        <div class="right">
-          <label for="lb-sport" class="sr-only">Sport</label>
-          <select id="lb-sport" class="lb-select" aria-label="Sport">
-            <option value="all">All sports</option>
-            <option value="mlb">MLB</option>
-            <option value="nfl">NFL</option>
-            <option value="sec">CFB (Power 4 + ND)</option>
-          </select>
+        <div class="filter-right">
+          <label class="filter-label" for="lb-sport">Sport</label>
+          <div class="select-wrap">
+            <select id="lb-sport" class="filter-select">
+              <option value="all">All sports</option>
+              <option value="mlb">MLB</option>
+              <option value="nfl">NFL</option>
+              <option value="sec">CFB (Power-4 + ND)</option>
+            </select>
+          </div>
         </div>
       </div>
+    </div>
 
-      <!-- Stat tiles -->
-      <section class="stat-grid" aria-label="Snapshot">
-        <article class="stat-card">
-          <div class="label">Active users</div>
-          <div class="value" id="stat-users">—</div>
-        </article>
-        <article class="stat-card">
-          <div class="label">Avg ROI</div>
-          <div class="value" id="stat-avg-roi">—</div>
-        </article>
-        <article class="stat-card">
-          <div class="label">Biggest single win</div>
-          <div class="value" id="stat-biggest-win">—</div>
-        </article>
-        <article class="stat-card">
-          <div class="label">Hottest streak</div>
-          <div class="value" id="stat-streak">—</div>
-        </article>
-      </section>
+    <!-- Summary tiles -->
+    <div class="card-grid three" style="margin-top:10px">
+      <div class="info-card">
+        <h3>Active users</h3>
+        <p id="stat-active">—</p>
+      </div>
+      <div class="info-card">
+        <h3>Avg ROI</h3>
+        <p id="stat-avg-roi">—</p>
+      </div>
+      <div class="info-card">
+        <h3>Biggest single win</h3>
+        <p id="stat-biggest">—</p>
+      </div>
+      <div class="info-card">
+        <h3>Hottest streak</h3>
+        <p id="stat-streak">—</p>
+      </div>
+    </div>
 
-      <!-- Side panels -->
-      <section class="columns">
-        <aside class="panel">
-          <h3>Top winners <span class="pill" id="winners-tag">—</span></h3>
-          <ol class="rank-list" id="winners-list" aria-live="polite"></ol>
-        </aside>
+    <!-- Winners / Losers headings -->
+    <div class="card-grid three" style="grid-template-columns:1fr 1fr; margin-top:14px;">
+      <div class="info-card" style="border-left-color: var(--green);">
+        <h3 style="margin:0 0 4px 0;">Top winners</h3>
+      </div>
+      <div class="info-card" style="border-left-color: var(--carmine);">
+        <h3 style="margin:0 0 4px 0;">Biggest losers</h3>
+      </div>
+    </div>
 
-        <aside class="panel">
-          <h3>Biggest losers <span class="pill" id="losers-tag">—</span></h3>
-          <ol class="rank-list" id="losers-list" aria-live="polite"></ol>
-        </aside>
-      </section>
-
-      <!-- Main table -->
-      <section class="table-wrap" aria-label="Leaderboard table">
-        <table class="lb">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>User</th>
-              <th>Record</th>
-              <th>Net</th>
-              <th>ROI</th>
-              <th>Best hit</th>
-              <th>Last 7d</th>
-            </tr>
-          </thead>
-          <tbody id="lb-tbody">
-            <!-- populated by assets/js/leaderboard.js -->
-          </tbody>
-        </table>
-      </section>
+    <!-- Table -->
+    <div class="odds-board" style="grid-template-columns:1fr;">
+      <div class="game-card">
+        <div class="gc-head">
+          <strong>#</strong>
+          <strong style="width:22%">User</strong>
+          <strong>Record</strong>
+          <strong>Net</strong>
+          <strong>ROI</strong>
+          <strong>Best hit</strong>
+          <strong>Last 7d</strong>
+        </div>
+        <div id="lb-table" class="gc-body" style="padding:12px;">
+          <!-- rows injected by leaderboard.js -->
+        </div>
+      </div>
     </div>
   </main>
 
-  <!-- Shared footer (populated by partial loader) -->
-  <footer id="site-footer"></footer>
+  <!-- Footer partial goes here -->
+  <div id="site-footer"></div>
 
-  <!-- Your site bootstrap that mounts header/footer partials -->
+  <!-- Existing site JS and page JS -->
   <script src="assets/js/app.js"></script>
+  <script src="assets/js/leaderboard.js?v=lb5"></script>
 
-  <!-- Leaderboard page logic -->
-  <script src="assets/js/leaderboard.js?v=lb4"></script>
+  <!-- Fallback tiny partial loader if app.js doesn't attach one -->
+  <script>
+    (function(){
+      function loadInto(sel, url){
+        const el = document.querySelector(sel);
+        if (!el) return;
+        fetch(url).then(r => r.ok ? r.text() : Promise.reject())
+                  .then(html => el.innerHTML = html)
+                  .catch(()=>{ /* no-op */});
+      }
+      // If your app.js already populated header/footer, skip.
+      if (!document.querySelector('#site-header').hasChildNodes()) {
+        loadInto('#site-header', 'partials/header.html');
+      }
+      if (!document.querySelector('#site-footer').hasChildNodes()) {
+        loadInto('#site-footer', 'partials/footer.html');
+      }
+    })();
+  </script>
 </body>
 </html>
