@@ -561,6 +561,128 @@ body{
   .lb-table .hide-sm{display:none}
 }
 
+/* =========================
+   Leaderboard page
+   ========================= */
+.leaderboard-banner {
+  background: linear-gradient(90deg, var(--indigo), #231045);
+}
+.leaderboard-banner .banner-inner {
+  padding: 18px 20px; color: #fff;
+}
+.leaderboard-banner h1 {
+  margin: 0 0 4px 0;
+  font-family: var(--font-nav);
+  font-size: 32px;
+  color: var(--maize);
+}
+
+.lb-wrap { max-width: 1200px; margin: 0 auto; }
+
+/* Filters */
+.lb-filters {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; margin: 10px 0 16px;
+  background: #fff;
+  border: 2px solid rgba(59,30,118,.14);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  padding: 10px 12px;
+}
+.lb-filters .left { display: flex; gap: 10px; flex-wrap: wrap; }
+.lb-filters .right { margin-left: auto; }
+
+.lb-seg { display: inline-flex; gap: 6px; background: #fbfaff; border: 1px solid #ebe6ff; border-radius: 999px; padding: 4px; }
+.lb-seg button {
+  border: 0; background: transparent; cursor: pointer;
+  font-family: var(--font-nav); font-size: 14px; letter-spacing: .03em;
+  padding: 8px 12px; border-radius: 999px; color: var(--indigo);
+}
+.lb-seg button.is-active { background: var(--indigo); color: var(--maize); }
+
+.lb-select {
+  font-family: var(--font-body); font-size: 14px; line-height: 1;
+  padding: 10px 12px; border-radius: 10px; border: 2px solid rgba(59,30,118,.22);
+  background: #fff; color: var(--deep);
+}
+
+/* Stat tiles */
+.stat-grid {
+  display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px;
+  margin-bottom: 16px;
+}
+.stat-card {
+  background: #fff; border: 2px solid rgba(59,30,118,.14);
+  border-radius: 14px; box-shadow: var(--shadow);
+  padding: 14px 16px;
+}
+.stat-card .label { font-size: 12px; opacity: .75; margin-bottom: 6px; }
+.stat-card .value { font-family: var(--font-nav); font-size: 22px; color: var(--indigo); }
+
+/* Side panels */
+.columns {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  margin-bottom: 16px;
+}
+.panel {
+  background: #fff; border: 2px solid rgba(59,30,118,.14);
+  border-radius: 14px; box-shadow: var(--shadow);
+  padding: 14px 14px 6px;
+}
+.panel h3 {
+  margin: 0 0 8px 0; font-family: var(--font-nav); color: var(--indigo); display: flex; align-items: center; gap: 8px;
+}
+.pill {
+  font-size: 12px; border: 1px solid rgba(59,30,118,.25);
+  background: #fbfaff; padding: 2px 8px; border-radius: 999px; color: #5a4aa8;
+}
+
+.rank-list { list-style: none; padding: 0; margin: 0; }
+.rank {
+  display: grid; grid-template-columns: 28px 1fr auto; align-items: center; gap: 8px;
+  padding: 8px 6px; border-bottom: 1px dashed #eee;
+}
+.rank:last-child { border-bottom: 0; }
+.rank .rk {
+  width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center;
+  background: #f2efff; color: var(--indigo); font-size: 12px; font-weight: 700;
+}
+.rank .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rank .mv { font-family: var(--font-nav); font-size: 14px; }
+.rank .mv.up { color: #1f7a3a; }
+.rank .mv.down { color: #b11f2d; }
+
+/* Table */
+.table-wrap {
+  background: #fff; border: 2px solid rgba(59,30,118,.14);
+  border-radius: 14px; box-shadow: var(--shadow);
+  overflow: hidden;
+}
+table.lb { width: 100%; border-collapse: collapse; }
+table.lb thead th {
+  text-align: left; font-family: var(--font-nav); font-size: 13px; letter-spacing: .04em;
+  background: #f7f3ff; color: var(--indigo);
+  padding: 10px; border-bottom: 1px solid #e7e0ff;
+}
+table.lb tbody td {
+  padding: 10px; border-bottom: 1px solid #f1ecff;
+  vertical-align: middle;
+}
+table.lb tbody tr:hover { background: #fbfaff; }
+table.lb td.pos { color: #1f7a3a; font-weight: 700; }
+table.lb td.neg { color: #b11f2d; font-weight: 700; }
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .stat-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .columns { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .lb-filters { flex-direction: column; align-items: stretch; }
+  .lb-filters .right { margin-left: 0; }
+  .stat-grid { grid-template-columns: 1fr; }
+}
+
 
 
 
