@@ -1,122 +1,106 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Leaderboard · Phantom Picks</title>
 
-  <!-- Use RELATIVE path for GitHub Pages -->
-  <link rel="stylesheet" href="./assets/css/styles.css">
+  <!-- site-wide styles only -->
+  <link rel="stylesheet" href="assets/css/styles.css?v=lb3">
 </head>
-<body>
+<body class="page-content no-rail">
+  <!-- header partial mount -->
+  <div id="header"></div>
 
-  <!-- Minimal site header: brand (logo + text), no nav or wallet -->
-  <header class="site-header">
-    <a class="brand" href="./index.html" aria-label="Phantom Picks home">
-      <img class="site-logo" src="./assets/img/logo.svg" alt="" />
-      <span class="logo-text">Phantom Picks</span>
-    </a>
-    <div style="margin-left:auto;"></div>
-  </header>
+  <main class="lb-wrap">
+    <!-- Page banner -->
+    <section class="league-banner leaderboard-banner">
+      <div class="banner-inner">
+        <h1>Leaderboard</h1>
+        <p>Track top winners, cold streaks, and weekly movers across the site.</p>
+      </div>
+    </section>
 
-  <main class="page-content no-rail">
-    <div class="lb-wrap">
-      <!-- Top: Tabs + Filters -->
-      <div class="lb-top">
-        <div class="lb-tabs" role="tablist" aria-label="Leaderboard tabs">
-          <button class="lb-tab is-active" role="tab" aria-selected="true">This Week</button>
-          <button class="lb-tab" role="tab" aria-selected="false">All-Time</button>
+    <!-- Filters -->
+    <div class="lb-filters" id="lb-filters">
+      <div class="left">
+        <div class="lb-seg" role="tablist" aria-label="Range">
+          <button class="is-active" data-range="7d" aria-selected="true">Last 7 days</button>
+          <button data-range="30d" aria-selected="false">Last 30 days</button>
+          <button data-range="all" aria-selected="false">All-time</button>
         </div>
-
-        <div class="lb-filters">
-          <label>
-            <select class="lb-select" aria-label="Time window">
-              <option>Last 7 days</option>
-              <option>Last 30 days</option>
-              <option>Season to date</option>
-            </select>
-          </label>
-          <input class="lb-search" type="search" placeholder="Search users…" aria-label="Search users">
+        <div class="lb-seg" role="tablist" aria-label="Scope">
+          <button class="is-active" data-scope="net" aria-selected="true">Net winnings</button>
+          <button data-scope="roi" aria-selected="false">ROI</button>
+          <button data-scope="volume" aria-selected="false">Volume</button>
         </div>
       </div>
-
-      <!-- Summary cards -->
-      <section class="lb-cards" aria-label="Highlights">
-        <article class="lb-card">
-          <h4>Top Earner</h4>
-          <div class="big">+ $1,420</div>
-          <div class="muted">u/JakeTheLake</div>
-        </article>
-        <article class="lb-card">
-          <h4>Longest Streak</h4>
-          <div class="big">7 W</div>
-          <div class="muted">u/BayouBets</div>
-        </article>
-        <article class="lb-card">
-          <h4>Best ROI</h4>
-          <div class="big">+ 42%</div>
-          <div class="muted">u/ModelGuy</div>
-        </article>
-        <article class="lb-card">
-          <h4>Most Picks</h4>
-          <div class="big">38</div>
-          <div class="muted">u/AlwaysSunny</div>
-        </article>
-      </section>
-
-      <!-- Main table -->
-      <section aria-label="Leaderboard table">
-        <table class="lb-table">
-          <thead>
-            <tr>
-              <th class="lb-rank">#</th>
-              <th>User</th>
-              <th class="hide-sm">W-L</th>
-              <th class="lb-sort">P/L</th>
-              <th class="hide-sm lb-sort">ROI</th>
-              <th class="lb-sort">Last 7d</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- Mock rows for now -->
-            <tr>
-              <td class="lb-rank">1</td>
-              <td><span class="lb-handle">u/JakeTheLake</span> <span class="lb-badge">CFB</span></td>
-              <td class="hide-sm">24-12</td>
-              <td><strong>+$1,420</strong></td>
-              <td class="hide-sm">+28%</td>
-              <td>+$310</td>
-            </tr>
-            <tr>
-              <td class="lb-rank">2</td>
-              <td><span class="lb-handle">u/ModelGuy</span> <span class="lb-badge">MLB</span></td>
-              <td class="hide-sm">18-7</td>
-              <td><strong>+$980</strong></td>
-              <td class="hide-sm">+42%</td>
-              <td>+$210</td>
-            </tr>
-            <tr>
-              <td class="lb-rank">3</td>
-              <td><span class="lb-handle">u/AlwaysSunny</span> <span class="lb-badge">NFL</span></td>
-              <td class="hide-sm">19-18</td>
-              <td><strong>+$350</strong></td>
-              <td class="hide-sm">+6%</td>
-              <td>-$40</td>
-            </tr>
-            <tr>
-              <td class="lb-rank">4</td>
-              <td><span class="lb-handle">u/BayouBets</span> <span class="lb-badge">CFB</span></td>
-              <td class="hide-sm">12-5</td>
-              <td><strong>+$290</strong></td>
-              <td class="hide-sm">+15%</td>
-              <td>+$120</td>
-            </tr>
-          </tbody>
-        </table>
-        <p class="lb-foot">Stats update daily at midnight ET. P/L assumes $10 flat stakes for mock data.</p>
-      </section>
+      <div class="right">
+        <select class="lb-select" id="lb-sport" aria-label="Sport">
+          <option value="all">All sports</option>
+          <option value="mlb">MLB</option>
+          <option value="nfl">NFL</option>
+          <option value="sec">CFB (Power 4 + ND)</option>
+        </select>
+      </div>
     </div>
+
+    <!-- Stat tiles -->
+    <section class="stat-grid" id="stat-grid">
+      <div class="stat-card">
+        <div class="label">Active bettors</div>
+        <div class="value" id="stat-users">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Avg ROI (selected range)</div>
+        <div class="value" id="stat-avg-roi">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Biggest single win</div>
+        <div class="value" id="stat-biggest-win">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Longest hot streak</div>
+        <div class="value" id="stat-streak">—</div>
+      </div>
+    </section>
+
+    <!-- Winners / Losers -->
+    <section class="columns">
+      <div class="panel">
+        <h3>Top Winners <span class="pill" id="winners-tag">7d · Net</span></h3>
+        <ul class="rank-list" id="winners-list"></ul>
+      </div>
+      <div class="panel">
+        <h3>Top Losers <span class="pill" id="losers-tag">7d · Net</span></h3>
+        <ul class="rank-list" id="losers-list"></ul>
+      </div>
+    </section>
+
+    <!-- Full table -->
+    <section class="table-wrap">
+      <table class="lb" aria-label="Leaderboard table">
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>User</th>
+            <th>Record</th>
+            <th>Net</th>
+            <th>ROI</th>
+            <th>Best hit</th>
+            <th>Last 7d</th>
+          </tr>
+        </thead>
+        <tbody id="lb-tbody"></tbody>
+      </table>
+    </section>
   </main>
 
+  <!-- footer partial mount -->
+  <div id="footer"></div>
+
+  <!-- external scripts only (no inline code) -->
+  <script src="assets/js/app.js"></script>          <!-- mounts header/footer partials -->
+  <script src="assets/js/leaderboard.js"></script>  <!-- page logic (mock or real) -->
 </body>
 </html>
