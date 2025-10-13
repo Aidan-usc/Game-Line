@@ -5,16 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Leaderboard · Phantom Picks</title>
 
-  <!-- Use your existing site stylesheet (relative path for GitHub Pages) -->
-  <link rel="stylesheet" href="assets/css/styles.css?v=lb5">
+  <!-- Site styles (adjust the path if this file is in a subfolder) -->
+  <link rel="stylesheet" href="assets/css/styles.css?v=lb1">
 </head>
-<body>
 
-  <!-- Header partial goes here -->
-  <div id="header"></div>
+<body>
+  <!-- Header placeholder (filled by fetch) -->
+  <div id="app-header" aria-hidden="true"></div>
 
   <!-- Main content -->
-  <main class="page-content" id="leaderboard-page">
+  <main class="page-content" id="leaderboard">
+    <!-- Banner -->
     <section class="league-banner league-sec">
       <div class="banner-inner">
         <h1>Leaderboard</h1>
@@ -22,110 +23,168 @@
       </div>
     </section>
 
+    <!-- Controls row -->
     <div class="filter-bar">
       <div class="filter-bar-inner">
-        <div class="filter-left" style="gap:10px">
-          <div class="select-wrap">
-            <button class="btn btn-refresh" data-range="7d"   id="lb-7d">7 days</button>
-            <button class="btn btn-refresh" data-range="30d"  id="lb-30d">30 days</button>
-            <button class="btn btn-refresh" data-range="all"  id="lb-all">All time</button>
-          </div>
+        <div class="filter-left" style="gap:8px;">
+          <button class="btn btn-refresh" data-range="7d">7 days</button>
+          <button class="btn btn-refresh" data-range="30d">30 days</button>
+          <button class="btn btn-refresh" data-range="all">All time</button>
 
-          <div class="select-wrap">
-            <button class="btn btn-refresh" data-metric="net"    id="lb-m-net">Net</button>
-            <button class="btn btn-refresh" data-metric="roi"    id="lb-m-roi">ROI</button>
-            <button class="btn btn-refresh" data-metric="volume" id="lb-m-vol">Volume</button>
-          </div>
+          <div class="divider" style="height:24px;"></div>
+
+          <button class="btn btn-refresh" data-metric="net">Net</button>
+          <button class="btn btn-refresh" data-metric="roi">ROI</button>
+          <button class="btn btn-refresh" data-metric="vol">Volume</button>
         </div>
 
-        <div class="filter-right">
-          <label class="filter-label" for="lb-sport">Sport</label>
+        <div class="filter-right" style="gap:10px;">
+          <span class="filter-label">Sport</span>
           <div class="select-wrap">
-            <select id="lb-sport" class="filter-select">
+            <select id="lb-sport" class="filter-select" aria-label="Sport filter">
               <option value="all">All sports</option>
               <option value="mlb">MLB</option>
               <option value="nfl">NFL</option>
-              <option value="sec">CFB (Power-4 + ND)</option>
+              <option value="sec">CFB</option>
             </select>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Summary tiles -->
-    <div class="card-grid three" style="margin-top:10px">
-      <div class="info-card">
+    <!-- KPI tiles -->
+    <div class="card-grid three" style="margin-bottom:12px;">
+      <div class="info-card kpi">
         <h3>Active users</h3>
-        <p id="stat-active">—</p>
+        <p id="kpi-active">—</p>
       </div>
-      <div class="info-card">
+      <div class="info-card kpi">
         <h3>Avg ROI</h3>
-        <p id="stat-avg-roi">—</p>
+        <p id="kpi-avg-roi">—</p>
       </div>
-      <div class="info-card">
+      <div class="info-card kpi">
         <h3>Biggest single win</h3>
-        <p id="stat-biggest">—</p>
-      </div>
-      <div class="info-card">
-        <h3>Hottest streak</h3>
-        <p id="stat-streak">—</p>
+        <p id="kpi-biggest-win">—</p>
       </div>
     </div>
 
+    <div class="info-card kpi" style="margin-bottom:16px;">
+      <h3>Hottest streak</h3>
+      <p id="kpi-streak">—</p>
+    </div>
+
     <!-- Winners / Losers headings -->
-    <div class="card-grid three" style="grid-template-columns:1fr 1fr; margin-top:14px;">
-      <div class="info-card" style="border-left-color: var(--green);">
-        <h3 style="margin:0 0 4px 0;">Top winners</h3>
+    <div class="card-grid two" style="margin-bottom:10px;">
+      <div class="info-card">
+        <h3>Top winners</h3>
       </div>
-      <div class="info-card" style="border-left-color: var(--carmine);">
-        <h3 style="margin:0 0 4px 0;">Biggest losers</h3>
+      <div class="info-card">
+        <h3>Biggest losers</h3>
       </div>
     </div>
 
     <!-- Table -->
-    <div class="odds-board" style="grid-template-columns:1fr;">
-      <div class="game-card">
-        <div class="gc-head">
-          <strong>#</strong>
-          <strong style="width:22%">User</strong>
-          <strong>Record</strong>
-          <strong>Net</strong>
-          <strong>ROI</strong>
-          <strong>Best hit</strong>
-          <strong>Last 7d</strong>
-        </div>
-        <div id="lb-table" class="gc-body" style="padding:12px;">
-          <!-- rows injected by leaderboard.js -->
-        </div>
+    <div class="info-card" style="padding:0;">
+      <div style="overflow-x:auto;">
+        <table class="table" id="lb-table" aria-label="Leaderboard table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>User</th>
+              <th>Record</th>
+              <th>Net</th>
+              <th>ROI</th>
+              <th>Best hit</th>
+              <th>Last 7d</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Placeholder rows for now -->
+            <tr><td colspan="7" style="text-align:center; opacity:.7;">No data yet</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </main>
 
-  <!-- Footer partial goes here -->
-  <div id="site-footer"></div>
+  <!-- Footer placeholder (filled by fetch) -->
+  <div id="app-footer" aria-hidden="true"></div>
 
-  <!-- Existing site JS and page JS -->
-  <script src="assets/js/app.js"></script>
-  <script src="assets/js/leaderboard.js?v=lb5"></script>
-
-  <!-- Fallback tiny partial loader if app.js doesn't attach one -->
   <script>
-    (function(){
-      function loadInto(sel, url){
-        const el = document.querySelector(sel);
-        if (!el) return;
-        fetch(url).then(r => r.ok ? r.text() : Promise.reject())
-                  .then(html => el.innerHTML = html)
-                  .catch(()=>{ /* no-op */});
+    // --- tiny helper to fetch partials with fallback paths ---
+    async function injectPartial(elId, paths) {
+      const host = document.getElementById(elId);
+      if (!host) return;
+      for (const p of paths) {
+        try {
+          const r = await fetch(p, {cache: 'no-store'});
+          if (r.ok) {
+            host.innerHTML = await r.text();
+            host.removeAttribute('aria-hidden');
+            return true;
+          }
+        } catch (_) {}
       }
-      // If your app.js already populated header/footer, skip.
-      if (!document.querySelector('#site-header').hasChildNodes()) {
-        loadInto('#site-header', 'partials/header.html');
+      console.warn('Partial not found for', elId, paths);
+      return false;
+    }
+
+    // Try common locations. Adjust if your partials live elsewhere.
+    const headerPaths = [
+      '/partials/header.html',
+      'partials/header.html',
+      '/assets/partials/header.html',
+      'assets/partials/header.html'
+    ];
+    const footerPaths = [
+      '/partials/footer.html',
+      'partials/footer.html',
+      '/assets/partials/footer.html',
+      'assets/partials/footer.html'
+    ];
+
+    (async () => {
+      const headerOk = await injectPartial('app-header', headerPaths);
+
+      // Mark Leaderboard as active in the nav once header is in DOM
+      if (headerOk) {
+        // Try matching by href fragment first
+        let link = document.querySelector('a[href*="leaderboard"]');
+        // Fallback: match by link text
+        if (!link) {
+          link = Array.from(document.querySelectorAll('a')).find(a =>
+            (a.textContent || '').trim().toLowerCase() === 'leaderboard'
+          );
+        }
+        if (link) {
+          link.classList.add('active');
+          // if your nav uses a current class name, add it here as well:
+          link.setAttribute('aria-current', 'page');
+        }
       }
-      if (!document.querySelector('#site-footer').hasChildNodes()) {
-        loadInto('#site-footer', 'partials/footer.html');
-      }
+
+      // Footer
+      await injectPartial('app-footer', footerPaths);
     })();
+
+    // (Optional) wire up the filter buttons to look 'selected' without
+    // adding new CSS. This simply toggles a data-selected attribute.
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('.btn.btn-refresh');
+      if (!btn) return;
+
+      // If it’s a range button, toggle within the range group
+      if (btn.dataset.range) {
+        document.querySelectorAll('.btn.btn-refresh[data-range]').forEach(b => b.removeAttribute('data-selected'));
+        btn.setAttribute('data-selected', 'true');
+      }
+
+      // If it’s a metric button, toggle within the metric group
+      if (btn.dataset.metric) {
+        document.querySelectorAll('.btn.btn-refresh[data-metric]').forEach(b => b.removeAttribute('data-selected'));
+        btn.setAttribute('data-selected', 'true');
+      }
+    });
   </script>
 </body>
 </html>
