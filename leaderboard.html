@@ -1,22 +1,122 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Leaderboard - Phantom Picks</title>
-  <link href="https://fonts.googleapis.com/css2?family=Nabla&family=Audiowide&family=Merriweather&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/styles.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Leaderboard · Phantom Picks</title>
+
+  <!-- Use RELATIVE path for GitHub Pages -->
+  <link rel="stylesheet" href="./assets/css/styles.css">
 </head>
 <body>
-  <div id="header"></div>
 
-  <main class="page-content">
-    <h1>Leaderboard</h1>
-    <p>Group and global leaderboards will appear here.</p>
+  <!-- Minimal site header: brand (logo + text), no nav or wallet -->
+  <header class="site-header">
+    <a class="brand" href="./index.html" aria-label="Phantom Picks home">
+      <img class="site-logo" src="./assets/img/logo.svg" alt="" />
+      <span class="logo-text">Phantom Picks</span>
+    </a>
+    <div style="margin-left:auto;"></div>
+  </header>
+
+  <main class="page-content no-rail">
+    <div class="lb-wrap">
+      <!-- Top: Tabs + Filters -->
+      <div class="lb-top">
+        <div class="lb-tabs" role="tablist" aria-label="Leaderboard tabs">
+          <button class="lb-tab is-active" role="tab" aria-selected="true">This Week</button>
+          <button class="lb-tab" role="tab" aria-selected="false">All-Time</button>
+        </div>
+
+        <div class="lb-filters">
+          <label>
+            <select class="lb-select" aria-label="Time window">
+              <option>Last 7 days</option>
+              <option>Last 30 days</option>
+              <option>Season to date</option>
+            </select>
+          </label>
+          <input class="lb-search" type="search" placeholder="Search users…" aria-label="Search users">
+        </div>
+      </div>
+
+      <!-- Summary cards -->
+      <section class="lb-cards" aria-label="Highlights">
+        <article class="lb-card">
+          <h4>Top Earner</h4>
+          <div class="big">+ $1,420</div>
+          <div class="muted">u/JakeTheLake</div>
+        </article>
+        <article class="lb-card">
+          <h4>Longest Streak</h4>
+          <div class="big">7 W</div>
+          <div class="muted">u/BayouBets</div>
+        </article>
+        <article class="lb-card">
+          <h4>Best ROI</h4>
+          <div class="big">+ 42%</div>
+          <div class="muted">u/ModelGuy</div>
+        </article>
+        <article class="lb-card">
+          <h4>Most Picks</h4>
+          <div class="big">38</div>
+          <div class="muted">u/AlwaysSunny</div>
+        </article>
+      </section>
+
+      <!-- Main table -->
+      <section aria-label="Leaderboard table">
+        <table class="lb-table">
+          <thead>
+            <tr>
+              <th class="lb-rank">#</th>
+              <th>User</th>
+              <th class="hide-sm">W-L</th>
+              <th class="lb-sort">P/L</th>
+              <th class="hide-sm lb-sort">ROI</th>
+              <th class="lb-sort">Last 7d</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Mock rows for now -->
+            <tr>
+              <td class="lb-rank">1</td>
+              <td><span class="lb-handle">u/JakeTheLake</span> <span class="lb-badge">CFB</span></td>
+              <td class="hide-sm">24-12</td>
+              <td><strong>+$1,420</strong></td>
+              <td class="hide-sm">+28%</td>
+              <td>+$310</td>
+            </tr>
+            <tr>
+              <td class="lb-rank">2</td>
+              <td><span class="lb-handle">u/ModelGuy</span> <span class="lb-badge">MLB</span></td>
+              <td class="hide-sm">18-7</td>
+              <td><strong>+$980</strong></td>
+              <td class="hide-sm">+42%</td>
+              <td>+$210</td>
+            </tr>
+            <tr>
+              <td class="lb-rank">3</td>
+              <td><span class="lb-handle">u/AlwaysSunny</span> <span class="lb-badge">NFL</span></td>
+              <td class="hide-sm">19-18</td>
+              <td><strong>+$350</strong></td>
+              <td class="hide-sm">+6%</td>
+              <td>-$40</td>
+            </tr>
+            <tr>
+              <td class="lb-rank">4</td>
+              <td><span class="lb-handle">u/BayouBets</span> <span class="lb-badge">CFB</span></td>
+              <td class="hide-sm">12-5</td>
+              <td><strong>+$290</strong></td>
+              <td class="hide-sm">+15%</td>
+              <td>+$120</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="lb-foot">Stats update daily at midnight ET. P/L assumes $10 flat stakes for mock data.</p>
+      </section>
+    </div>
   </main>
 
-  <div id="footer"></div>
-  <script src="js/app.js"></script>
 </body>
 </html>
-
